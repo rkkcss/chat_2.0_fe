@@ -10,22 +10,21 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button } from "./Button";
-import { io } from "socket.io-client";
-
+import io from 'socket.io-client'
 
 
 export const ChatMessages = () => {
   
 
   useEffect(() => {
-    const socket = io('http://192.168.0.18:8085', {
+    const socket = io('ws://192.168.0.18:8085', {
       reconnection: false,
     });
-    socket.on('connect', () => {
-      console.log('connect...')
+    socket.on('connect', (res) => {
+      console.log(res)
     });
     return () => {
-      socket.off('disconnect')
+      socket.disconnect();
     }
   },[])
 
