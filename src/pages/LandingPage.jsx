@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export const LandingPage = () => {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row h-screen">
       <CategoryMenu />
       <Outlet />
     </div>

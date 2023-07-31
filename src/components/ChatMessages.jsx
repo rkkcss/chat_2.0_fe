@@ -1,102 +1,87 @@
-import React, { useEffect } from "react";
-import user from "../assets/user.jpg";
+import React, { useEffect, useRef, useState } from "react";
+import userImg from "../assets/user.jpg";
 import {
-  BarsOutlined,
+  ArrowLeftOutlined,
   EllipsisOutlined,
-  FileImageOutlined,
-  LeftOutlined,
-  PhoneOutlined,
-  SettingOutlined,
-  VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button } from "./Button";
-import io from 'socket.io-client'
+import { API } from "../axios/API";
+import { useSelector } from "react-redux";
 
 
-export const ChatMessages = () => {
-  
+export const ChatMessages = ({messages, ourSelf, room, socket, setSelectedRoomNull}) => {
+  const scrollRef = useRef();
+  const messageInput = useRef('');
+  const user = useSelector(state => state.userStore.user);
 
   useEffect(() => {
-    const socket = io('ws://192.168.0.18:8085', {
-      reconnection: false,
+    scrollRef.current?.scrollIntoView({behavior: 'smooth'})
+  },[messages])
+
+
+  //save message to db and send to the group via socket
+  const sendMessageAndSave = () => {
+    API.post(`/api/messages/${room.id}`, {text:messageInput.current.value}).then(res => {
+
     });
-    socket.on('connect', (res) => {
-      console.log(res)
+    socket.current.emit("groupMessageToServer", {
+      profile: {
+        id: ourSelf.id
+      }, 
+      text: messageInput.current.value,
+      roomId: room.id
     });
-    return () => {
-      socket.disconnect();
-    }
-  },[])
+    messageInput.current.value = '';
+  }
 
   return (
-    <div className="min-h-screen w-full">
+    
       <div className="h-full flex flex-col">
         <div className="p-6 border-b">
           <div className="mt-4 flex items-center justify-between">
-            <div>
+            <div className="flex items-center text-4xl gap-2">
+              <ArrowLeftOutlined className="lg:hidden text-black cursor-pointer" onClick={setSelectedRoomNull}/>
               <img
-                src={user}
+                src={userImg}
                 alt=""
-                className="rounded-full min-w-[96px] max-w-[96px] min-h-[96px] max-h-[96px]"
+                className="rounded-full min-w-[67px] max-w-[67px] min-h-[67px] max-h-[67px]"
               />
             </div>
             <div className="w-full flex items-center justify-between ml-3">
               <div>
-                <h1 className="text-4xl font-bold">Kiss Jani</h1>
+                <h1 className="text-4xl font-bold">{room.name}</h1>
                 <span className="text-xl text-emerald-500 font-bold">
                   Elérhető
                 </span>
               </div>
               <div className="text-4xl">
-                <EllipsisOutlined />
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              <div className="text-3xl rounded-full border-gray-300 border-2 flex text-gray-400">
-                <div className="py-3 px-5 items-center flex hover:cursor-pointer hover:text-emerald-400">
-                  <PhoneOutlined />
-                </div>
-                <div className="py-3 px-5 items-center flex hover:cursor-pointer hover:text-emerald-400">
-                  <VideoCameraOutlined />
-                </div>
-                <div className="py-3 px-5 items-center flex hover:cursor-pointer hover:text-emerald-400">
-                  <FileImageOutlined />
-                </div>
-                <div className="py-3 px-5 items-center flex hover:cursor-pointer hover:text-emerald-400">
-                  <SettingOutlined />
-                </div>
+                <EllipsisOutlined className="hover:bg-green-300 hover:cursor-pointer rounded-full border-2" />
               </div>
             </div>
           </div>
         </div>
 
         <div className="flex-grow p-6 overflow-y-auto">
-          <div className="flex justify-start text-lg my-2">
-            <span className="rounded-2xl p-2.5 bg-emerald-300  max-w-[80%]">
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem voltál
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem voltál
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem
-              voltálSzia buzigyerek mi a szar van veled? nem is tudom miota nem
-              voltál
-            </span>
-          </div>
-          <div className="flex justify-end text-lg my-2 ">
-            <span className="rounded-2xl p-2.5 border-2 bg-white max-w-[80%]">
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem voltál
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem voltál
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem voltál
-            </span>
-          </div>
 
-          <div className="flex justify-start text-lg my-2">
-            <span className="rounded-2xl p-2.5 bg-emerald-300 max-w-[80%]">
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem voltál
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem voltál
-              Szia buzigyerek mi a szar van veled? nem is tudom miota nem
-              voltálSzia buzigyerek mi a szar van veled? nem is tudom miota nem
-              voltál
-            </span>
-          </div>
+          {
+            messages.map((message, i) => 
+              (
+              message.profile?.id === ourSelf?.id ?
+                
+                <div key={i} className="flex justify-end text-lg my-2" ref={scrollRef}>
+                  <span className="rounded-2xl p-2.5 border-2 bg-white max-w-[80%]">
+                    {message.text}
+                  </span>
+                </div>
+                :
+                <div key={i} className="flex justify-start text-lg my-2" ref={scrollRef}>
+                  <span className="rounded-2xl p-2.5 bg-emerald-300  max-w-[80%]">
+                    {message.text}
+                  </span>
+                </div>  
+              )
+            )
+          }
         </div>
 
         <div className="w-full flex border-t p-6 border-gray-300">
@@ -105,13 +90,13 @@ export const ChatMessages = () => {
               type="text"
               placeholder="Üzenet..."
               className="shadow border rounded-xl w-full px-2.5 py-2.5 text-gray-700 leading-tight focus:outline-emerald-100 focus:shadow-outline"
+              ref={messageInput}
             />
           </div>
-          <div>
-            <Button type={"primary"} text={"Küld"} />
+          <div onClick={sendMessageAndSave}>
+            <Button type={"primary"} text={"Küld"}/>
           </div>
         </div>
       </div>
-    </div>
   );
 };

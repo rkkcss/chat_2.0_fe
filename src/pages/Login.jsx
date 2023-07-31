@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../components/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/authSlice";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.userStore);
+  const navigate = useNavigate();
 
   const [loginData, setLoginData] = useState({
     username: "",
@@ -14,6 +17,12 @@ export const Login = () => {
   const handleLogin = (e) => {
     setLoginData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  },[user])
 
   const handleSubmit = (e) => {
     e.preventDefault();
