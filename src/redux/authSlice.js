@@ -29,7 +29,8 @@ export const loginUser = createAsyncThunk('loginUser', async (user, { dispatch }
 
 export const logoutUser = createAsyncThunk('logoutUser', async () => {
     const result = await API.post('/api/logout').then().then(res => {
-        toast.success('Sikeres kijelentkezés');
+        window.location.href('/login')
+        //toast.success('Sikeres kijelentkezés');
     }).catch(err => {
         console.log(err)
     })
