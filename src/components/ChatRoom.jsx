@@ -1,28 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import userImg from "../assets/user.jpg";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
+import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
 
-export const ChatRoom = ({roomName, lastMessage}) => {
-  console.log(roomName)
+export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
+  const isAnyUserOnline = useIsAnyUserOnline(
+    ourSelf,
+    activeUsers,
+    room.participants
+  );
   return (
     <>
+      <div className="relative ">
+        <img
+          src={userImg}
+          className="rounded-full min-h-[64px] max-h-[64px] min-w-[64px] max-w-[64px]"
+        />
+        {isAnyUserOnline == true && (
+          <span className="absolute top-1 right-1 p-1.5 bg-green-500 rounded-full"></span>
+        )}
+      </div>
+      <div className="flex flex-row justify-between w-full ml-4">
         <div>
-            <img
-            src={userImg}
-            className="rounded-full min-h-[64px] max-h-[64px] min-w-[64px] max-w-[64px]"
-            />
+          <p className="text-gray-700 font-medium text-xl">{room.name}</p>
+          <span className="text-slate-400">
+            {lastMessage.text ? lastMessage.text : "Új beszélgetés indítása..."}
+          </span>
         </div>
-        <div className="flex flex-row justify-between w-full ml-4">
-            <div>
-            <p className="text-gray-700 font-medium text-xl">{roomName}</p>
-            <span className="text-slate-400">
-              {lastMessage}
-            </span>
-            </div>
-            <div className="flex items-center">
-            <p>12:44 AM</p>
-            </div>
+        <div className="flex items-start">
+          <p>{lastMessage.createdDate}</p>
         </div>
+      </div>
     </>
-  )
-}
+  );
+};

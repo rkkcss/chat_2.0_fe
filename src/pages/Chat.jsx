@@ -1,65 +1,59 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  SettingOutlined,
-  CheckOutlined,
-  PlusCircleOutlined,
-  MinusCircleOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import { Button } from "../components/Button";
-import user from "../assets/user.jpg";
-import { ChatMessages } from "../components/ChatMessages";
+import { PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import { API } from "../axios/API";
 import { ChatRoom } from "../components/ChatRoom";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { SearchInUsers } from "../components/SearchInUsers";
 import { NewChat } from "../modals/NewChat";
+import { Link, Outlet, useParams } from "react-router-dom";
 
 export const Chat = () => {
   const socket = useRef();
 
+  const { roomId } = useParams();
+  const [selectedRoom, setSelectedRoom] = useState({});
   const [createChatModal, setCreateChatModal] = useState(false);
   const [isSearchingMessage, setSearchingMessage] = useState(false);
   const [rooms, setRooms] = useState([]);
-  const [roomMessages, setRoomMessages] = useState([]);
   const ourSelf = useSelector((state) => state.userStore.user);
-  const [selectedRoom, setSelectedRoom] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
     socket.current = io("ws://192.168.0.26:8085");
     API.get("/api/rooms").then((res) => {
       setRooms(res.data);
-      console.log("roms", res.data);
     });
+    const handleGetActiveUsers = (userList) => handleGetActiveUsers(userList);
+    const activeUsersListener = (userList) => {
+      const newList = Object.keys(userList).map((userId) => ({
+        id: userId,
+        sessionId: userList[userId],
+      }));
+      setActiveUsers(newList);
+    };
+
+    socket?.current.on("getActiveUsers", activeUsersListener);
+
     return () => {
-      socket.current.on("disconnect");
+      socket.current.off("getActiveUsers", activeUsersListener);
+      socket.current.disconnect();
     };
   }, []);
 
-  const getSelectedRoomMessages = (room) => {
-    //add user to a room
-    socket.current.emit("joinRoom", { roomId: room.id });
-
-    setSelectedRoom(room);
-    API.get(`/api/messages/room/${room.id}`).then((res) => {
-      console.log(res.data);
-      setRoomMessages(res.data);
+  useEffect(() => {
+    rooms.filter((room) => {
+      if (room.id == roomId) {
+        setSelectedRoom(room);
+      }
     });
-  };
+  }, [rooms]);
 
   //add userid to server when connected
   useEffect(() => {
     socket.current.emit("getUserId", ourSelf.id);
-  }, [ourSelf]);
-
-  //
-  useEffect(() => {
-    socket?.current?.on("groupMessageToClient", (data) => {
-      setRoomMessages([...roomMessages, data]);
-    });
-  });
+  }, []);
 
   const searchUsers = (e) => {
     setSearchInput(e.target.value);
@@ -73,9 +67,9 @@ export const Chat = () => {
   };
 
   const getLastMessage = (room) => {
-    // return room?.messages[room?.messages?.length - 1]?.text == undefined
-    //   ? "Új beszélgetés indítása."
-    //   : room?.messages[room.messages?.length - 1]?.text;
+    return room?.messages.length == 0
+      ? ""
+      : room?.messages[room.messages?.length - 1];
   };
 
   return (
@@ -86,11 +80,11 @@ export const Chat = () => {
       />
       <div
         className={`max-w-[500px] min-w-[500px] border-r-2 p-7 ${
-          selectedRoom ? "hidden lg:block" : ""
+          false ? "hidden lg:block" : ""
         }`}
       >
-        <div className="h-full border rounded-lg p-4 overflow-y-auto">
-          <div className="border-b pb-3">
+        <div className="h-full border rounded-lg overflow-y-auto">
+          <div className="border-b pb-3 p-4">
             <div className="flex justify-between items-start">
               <h1 className="font-bold text-2xl mb-3">Messages</h1>
               <div className="flex gap-2">
@@ -118,39 +112,32 @@ export const Chat = () => {
           </div>
           <div className="">
             {rooms.map((room) => (
-              <div
-                className="flex flex-row border-b py-5 hover:cursor-pointer"
+              <Link
+                to={"/chat/" + room.id}
+                className="flex flex-row hover:cursor-pointer hover:bg-gray-100/60 p-4"
                 key={room.id}
-                onClick={() => getSelectedRoomMessages(room)}
+                onClick={() => setSelectedRoom(room)}
               >
                 <ChatRoom
-                  roomName={room.name}
+                  room={room}
                   lastMessage={getLastMessage(room)}
+                  activeUsers={activeUsers}
+                  ourSelf={ourSelf}
                 />
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </div>
+
       <div className={`min-h-screen w-full`}>
-        {selectedRoom ? (
-          <ChatMessages
-            className={`${selectedRoom ? "" : "hidden"}`}
-            messages={roomMessages}
-            ourSelf={ourSelf}
-            room={selectedRoom}
-            socket={socket}
-            setSelectedRoomNull={() => setSelectedRoom("")}
-          />
-        ) : (
-          <div
-            className={`${
-              selectedRoom ? "" : "hidden sm:hidden md:grid place-items-center"
-            } text-xl min-h-screen`}
-          >
-            Válaszd ki kivel szeretnél beszélgetni!
-          </div>
-        )}
+        <Outlet
+          context={{
+            room: selectedRoom,
+            socket: socket,
+            activeUsers: activeUsers,
+          }}
+        />
       </div>
     </>
   );

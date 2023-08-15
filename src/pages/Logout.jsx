@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
-import { API } from "../axios/API";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/authSlice";
+import { useNavigate } from "react-router-dom";
 
 export const Logout = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
-    dispatch(logoutUser);
+    console.log("logout");
+    dispatch(logoutUser());
     navigate("/login");
   }, []);
+  return <div>Logout</div>;
 };

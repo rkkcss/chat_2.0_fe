@@ -22,18 +22,18 @@ export const getAccountInfo = createAsyncThunk('getAccountInfo', async () => {
 export const loginUser = createAsyncThunk('loginUser', async (user, { dispatch }) => {
     const result = await APILogin.post('/api/authentication', user).then(res => {
         //toast.success('Sikeresen bejelentkeztél!')
-    }).then(res => {
         dispatch(getAccountInfo());
+    }).then(res => {
+        
     });
 });
 
 export const logoutUser = createAsyncThunk('logoutUser', async () => {
-    const result = await API.post('/api/logout').then().then(res => {
-        window.location.href('/login')
+    const result = await API.post('/api/logout',{}).then().then(res => {
+        
         //toast.success('Sikeres kijelentkezés');
-    }).catch(err => {
-        console.log(err)
-    })
+    });
+    console.log('logout',result)
     return result;
 });
 
