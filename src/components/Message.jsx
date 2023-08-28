@@ -7,8 +7,8 @@ export const Message = ({ message, scrollRef }) => {
   const user = useSelector((state) => state.userStore.user);
 
   return message.user?.id === user?.id ? (
-    <div className="flex justify-end text-lg py-3 group" ref={scrollRef}>
-      <div className="flex items-center text-gray-400 opacity-0 group-hover:opacity-100">
+    <div className="flex justify-end text-lg py-3 group gap-2" ref={scrollRef}>
+      <div className="flex items-center text-gray-400 opacity-0 group-hover:opacity-100 relative">
         <SmileOutlined className="hover:rounded-full hover:cursor-pointer p-1 hover:bg-gray-200" />
         <MoreOutlined className="hover:rounded-full hover:cursor-pointer p-1 hover:bg-gray-200" />
       </div>
@@ -31,7 +31,6 @@ export const Message = ({ message, scrollRef }) => {
           {message.text}
         </span>
       </div>
-
       <div className="flex items-center text-gray-400 opacity-0 group-hover:opacity-100">
         <SmileOutlined className="hover:rounded-full hover:cursor-pointer p-1 hover:bg-gray-200" />
         <MoreOutlined className="hover:rounded-full hover:cursor-pointer p-1 hover:bg-gray-200" />

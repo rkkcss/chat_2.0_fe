@@ -7,7 +7,8 @@ const initialState = {
     user: null,
     loading: false,
     msg: "",
-    error: false
+    error: false,
+    theme: "light",
 }
 
 export const getAccountInfo = createAsyncThunk('getAccountInfo', async () => {
@@ -30,7 +31,7 @@ export const loginUser = createAsyncThunk('loginUser', async (user, { dispatch }
 
 export const logoutUser = createAsyncThunk('logoutUser', async () => {
     const result = await API.post('/api/logout',{}).then().then(res => {
-        
+        window.location.href = '/login'
         //toast.success('Sikeres kijelentkezés');
     });
     console.log('logout',result)
@@ -46,6 +47,9 @@ const loginSlice = createSlice({
         },
         loadingFalse(state) {
             state.loading = false;
+        },
+        toggleTheme(state, action) {
+            state.theme = action.payload;
         }
     },
     extraReducers(builder) {
@@ -84,6 +88,6 @@ const loginSlice = createSlice({
     }
 });
 
-export const { loadingTrue, loadingFalse } = loginSlice.actions;
+export const { loadingTrue, loadingFalse, toggleTheme} = loginSlice.actions;
 
 export default loginSlice.reducer;

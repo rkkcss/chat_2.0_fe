@@ -24,16 +24,22 @@ API.interceptors.response.use(
         return response;
     },
     error => {
-        console.log(error.response);
-        switch (error.response.status) {
-            case 404:
-                // notification.error({ message: "Valami nincs rendben!" });
-                break;
-            case 401:
-            window.location.href = '/logout';
-            default:
-                // notification.error({ message: error.response.statusText });
-                break;
+        console.log('error',error);
+        if (error.response != null) {
+            console.log('if 1')
+            switch (error.response.status) {
+                case 404:
+                    // notification.error({ message: "Valami nincs rendben!" });
+                    break;
+                case 401:
+                    window.location.href = '/logout';
+                    break;
+                default:
+                    // notification.error({ message: error.response.statusText });
+                    break;
+            }   
+        }else{
+            window.location.href = '/login'
         }
         return Promise.reject(error);
     }

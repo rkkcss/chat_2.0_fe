@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import userImg from "../assets/user.jpg";
-import { ArrowLeftOutlined, EllipsisOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  EllipsisOutlined,
+  FileImageOutlined,
+  GifOutlined,
+  SmileOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 import { Button } from "./Button";
 import { API } from "../axios/API";
 import { useSelector } from "react-redux";
@@ -146,8 +153,14 @@ export const ChatMessagesSection = () => {
         </div>
       </div>
 
-      <div className="w-full flex border-t p-6 border-gray-300">
-        <div className="flex-grow pr-5">
+      <div className="w-full block border-t px-6 pb-4 border-gray-300">
+        <div className="py-2 text-xl text-gray-400 gap-9 flex">
+          <FileImageOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
+          <VideoCameraOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
+          <GifOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
+          <SmileOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
+        </div>
+        <div className="flex flex-grow gap-5 justify-between w-full">
           <input
             type="text"
             placeholder="Üzenet..."
@@ -155,9 +168,10 @@ export const ChatMessagesSection = () => {
             ref={messageInput}
             onChange={userTypeingHandler}
           />
-        </div>
-        <div onClick={sendMessageAndSave}>
-          <Button type={"primary"} text={"Küld"} />
+
+          <div onClick={sendMessageAndSave}>
+            <Button type={"primary"} text={"Küld"} />
+          </div>
         </div>
       </div>
     </div>

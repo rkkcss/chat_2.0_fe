@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import user from "../assets/user.jpg";
 import {
   HomeOutlined,
@@ -8,8 +8,14 @@ import {
   LaptopOutlined,
 } from "@ant-design/icons";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import moonIcon from "../assets/moon-icon.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../redux/authSlice";
 
 export const CategoryMenu = () => {
+  const { theme } = useSelector((state) => state.userStore);
+  const dispatch = useDispatch();
+
   const menuItems = [
     {
       id: "1",
@@ -33,9 +39,13 @@ export const CategoryMenu = () => {
     },
   ];
 
+  const changeTheme = () => {
+    dispatch(toggleTheme(theme == "dark" ? "light" : "dark"));
+  };
+
   return (
     <div className="min-w-[64px] max-w-[64px] min-h-screen border-r-2 flex flex-col justify-between">
-      <div className="">
+      <div>
         <img
           src={user}
           alt="User picture"
@@ -55,12 +65,14 @@ export const CategoryMenu = () => {
           );
         })}
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-5">
         <div className="flex justify-center">
-          <label className="relative inline-flex cursor-pointer items-center">
-            <input type="checkbox" id="example1" className="peer sr-only" />
-            <div className="h-6 w-11 rounded-full bg-emerald-400 after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:content-[''] hover:bg-emerald-500 peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-primary-200 peer-disabled:cursor-not-allowed peer-disabled:bg-gray-100 peer-disabled:after:bg-gray-50"></div>
-          </label>
+          <img
+            src={moonIcon}
+            alt=""
+            className="w-8 h-8 hover:cursor-pointer"
+            onClick={changeTheme}
+          />
         </div>
         <Link
           to={"/logout"}

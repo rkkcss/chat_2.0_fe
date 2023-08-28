@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import userImg from "../assets/user.jpg";
 import { useSelector } from "react-redux";
 import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
+import dayjs from "dayjs";
 
 export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
   const isAnyUserOnline = useIsAnyUserOnline(
@@ -28,7 +29,7 @@ export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
           </span>
         </div>
         <div className="flex items-start">
-          <p>{lastMessage.createdDate}</p>
+          <p>{dayjs(lastMessage.createdDate).format("ddd")}</p>
         </div>
       </div>
     </>

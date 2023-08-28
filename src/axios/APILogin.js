@@ -30,8 +30,8 @@ APILogin.interceptors.response.use(
                 // notification.error({ message: "Valami nincs rendben!" });
                 break;
             case 401:
-            window.location.href = '/logout';
-            //localStorage.clear();
+                //window.location.href = '/logout';
+                //localStorage.clear();
             default:
                 // notification.error({ message: error.response.statusText });
                 break;
