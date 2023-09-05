@@ -3,6 +3,7 @@ import userImg from "../assets/user.jpg";
 import { useSelector } from "react-redux";
 import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
 import dayjs from "dayjs";
+import moment from "moment";
 
 export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
   const isAnyUserOnline = useIsAnyUserOnline(
@@ -24,12 +25,10 @@ export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
       <div className="flex flex-row justify-between w-full ml-4">
         <div>
           <p className="text-gray-700 font-medium text-xl">{room.name}</p>
-          <span className="text-slate-400">
-            {lastMessage.text ? lastMessage.text : "Új beszélgetés indítása..."}
-          </span>
+          {/* <span className="text-slate-400">text</span> */}
         </div>
         <div className="flex items-start">
-          <p>{dayjs(lastMessage.createdDate).format("ddd")}</p>
+          {/* <p>{moment(lastMessage.createdDate).calendar()}</p> */}
         </div>
       </div>
     </>

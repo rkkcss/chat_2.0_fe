@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const Button = ({ text, variant, type }) => {
+export const Button = ({ text, variant, type, onClick }) => {
   const [buttonClass, setButtonClass] = useState("");
   useEffect(() => {
     switch (variant) {
@@ -19,7 +19,8 @@ export const Button = ({ text, variant, type }) => {
   return (
     <button
       className={`text-lg font-medium rounded-xl border px-4 py-1.5 ${buttonClass} border-emerald-400`}
-      type={type == 'submit' ? 'submit' : 'button'}
+      type={type == "submit" ? "submit" : "button"}
+      onClick={onClick}
     >
       {text}
     </button>

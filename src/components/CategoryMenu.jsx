@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import user from "../assets/user.jpg";
+import sunIcon from "../assets/sun-theme.svg";
 import {
   HomeOutlined,
   MessageOutlined,
@@ -7,7 +8,12 @@ import {
   SettingOutlined,
   LaptopOutlined,
 } from "@ant-design/icons";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import moonIcon from "../assets/moon-icon.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/authSlice";
@@ -67,12 +73,21 @@ export const CategoryMenu = () => {
       </div>
       <div className="flex flex-col gap-5">
         <div className="flex justify-center">
-          <img
-            src={moonIcon}
-            alt=""
-            className="w-8 h-8 hover:cursor-pointer"
-            onClick={changeTheme}
-          />
+          {theme === "dark" ? (
+            <img
+              src={sunIcon}
+              alt=""
+              className="w-10 h-10 hover:cursor-pointer"
+              onClick={changeTheme}
+            />
+          ) : (
+            <img
+              src={moonIcon}
+              alt=""
+              className="w-8 h-8 hover:cursor-pointer"
+              onClick={changeTheme}
+            />
+          )}
         </div>
         <Link
           to={"/logout"}

@@ -20,7 +20,7 @@ export const Message = ({ message, scrollRef }) => {
     </div>
   ) : (
     <div
-      className="flex justify-start text-lg py-2 items-center gap-2 
+      className="flex justify-start text-lg py-2 items-center gap-2
           group
           "
       ref={scrollRef}

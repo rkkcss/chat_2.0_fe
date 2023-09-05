@@ -13,7 +13,6 @@ export const Chat = () => {
 
   const { roomId } = useParams();
   const [selectedRoom, setSelectedRoom] = useState({});
-  const [createChatModal, setCreateChatModal] = useState(false);
   const [isSearchingMessage, setSearchingMessage] = useState(false);
   const [rooms, setRooms] = useState([]);
   const ourSelf = useSelector((state) => state.userStore.user);
@@ -66,18 +65,8 @@ export const Chat = () => {
     }, 500);
   };
 
-  const getLastMessage = (room) => {
-    return room?.messages.length == 0
-      ? ""
-      : room?.messages[room.messages?.length - 1];
-  };
-
   return (
     <>
-      <NewChat
-        onOpen={createChatModal}
-        onClose={() => setCreateChatModal(false)}
-      />
       <div
         className={`max-w-[500px] min-w-[500px] border-r-2 p-7 ${
           false ? "hidden lg:block" : ""
@@ -88,13 +77,13 @@ export const Chat = () => {
             <div className="flex justify-between items-start">
               <h1 className="font-bold text-2xl mb-3">Messages</h1>
               <div className="flex gap-2">
-                <PlusCircleOutlined
-                  className="text-2xl 
+                <Link to={"/chat/new"}>
+                  <PlusCircleOutlined
+                    className="text-2xl 
                 hover:cursor-pointer 
                 hover:text-green-300"
-                  onClick={() => setCreateChatModal(true)}
-                />
-
+                  />
+                </Link>
                 <SearchOutlined
                   className={`text-2xl 
                 hover:cursor-pointer 
@@ -120,7 +109,6 @@ export const Chat = () => {
               >
                 <ChatRoom
                   room={room}
-                  lastMessage={getLastMessage(room)}
                   activeUsers={activeUsers}
                   ourSelf={ourSelf}
                 />
@@ -131,13 +119,16 @@ export const Chat = () => {
       </div>
 
       <div className={`min-h-screen w-full`}>
-        <Outlet
-          context={{
-            room: selectedRoom,
-            socket: socket,
-            activeUsers: activeUsers,
-          }}
-        />
+        <div className="h-full flex flex-col">
+          <Outlet
+            context={{
+              room: selectedRoom,
+              socket: socket,
+              activeUsers: activeUsers,
+              setSelectedRoom: setSelectedRoom,
+            }}
+          />
+        </div>
       </div>
     </>
   );
