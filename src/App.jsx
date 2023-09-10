@@ -17,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { SettingsMenuItems } from "./components/SettingsMenuItems";
 import { SettingsProfile } from "./components/SettingsProfile";
 import { CreateNewChat } from "./components/CreateNewChat";
+import { SettingsSecurity } from "./components/SettingsSecurity";
 
 function App() {
   const { theme } = useSelector((state) => state.userStore);
@@ -41,6 +42,7 @@ function App() {
               <Route path="game" element={<TicTocToe />} />
               <Route path="settings" element={<Settings />}>
                 <Route path="profile" element={<SettingsProfile />}></Route>
+                <Route path="security" element={<SettingsSecurity />}></Route>
               </Route>
             </Route>
 

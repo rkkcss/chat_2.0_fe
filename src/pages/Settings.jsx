@@ -5,7 +5,7 @@ export const Settings = () => {
   const menuItems = [
     {
       id: 1,
-      label: "Saját adatok",
+      label: "Saját profil",
       link: "/settings/profile",
     },
     {

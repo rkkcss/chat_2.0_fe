@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "./Button";
 import userImg from "../assets/user.jpg";
-import lib, { DeleteOutlined } from "@ant-design/icons";
+import lib, {
+  DeleteOutlined,
+  InfoCircleOutlined,
+  LinkOutlined,
+} from "@ant-design/icons";
 import { API } from "../axios/API";
 import Select from "react-tailwindcss-select";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const CreateNewChat = (props) => {
   const [searchedUsers, setSearchedUsers] = useState([]);
@@ -12,6 +17,7 @@ export const CreateNewChat = (props) => {
   const [existsRoom, setExistsRoom] = useState(null);
   const { room, setSelectedRoom } = useOutletContext();
   const navigate = useNavigate();
+  const roomNameRef = useRef("");
 
   const navigateToChatRoom = () => {
     setSelectedRoom(existsRoom);
@@ -52,23 +58,37 @@ export const CreateNewChat = (props) => {
   //
 
   const handleSubmit = () => {
-    console.log("su", {
-      name: "asd",
-      participants: selectedUsers,
-    });
     API.post("/api/rooms", {
       users: selectedUsers,
-      room: { name: "teszt szoba" },
-    }).then((res) => {
-      setExistsRoom(res.data);
-    });
+      room: { name: roomNameRef.current.value },
+    })
+      .then((res) => {
+        toast.success("Sikeresen létrejött a beszélgetés!");
+      })
+      .catch((res) => {
+        if (res?.response?.status == 302) {
+          setExistsRoom(res.response.data);
+        }
+      });
   };
   console.log("room", room);
   return (
     <>
       <div className="p-6 flex gap-4 flex-col">
+        <p className="text-3xl text-gray-600">Csevegés létrehozása</p>
+        <div className="w-full">
+          <label className="text-lg font-medium text-gray-500">
+            Szoba neve:
+          </label>
+          <input
+            type="text"
+            ref={roomNameRef}
+            className="mt-3 shadow border rounded-xl w-full px-2.5 py-2.5 text-gray-700 leading-tight focus:outline-emerald-100 focus:shadow-outline"
+            placeholder="Írd a szoba nevét..."
+          />
+        </div>
         <div className="flex flex-col gap-2">
-          <label className="text-lg font-medium text-gray-600">
+          <label className="text-lg font-medium text-gray-500">
             Címzett(ek):
           </label>
           <Select
@@ -94,24 +114,32 @@ export const CreateNewChat = (props) => {
         </div>
         {existsRoom && (
           <>
-            <label className="text-lg font-medium text-gray-600">
-              Van már ilyen szoba:
+            <label className="text-lg font-medium text-gray-600 flex items-center gap-3">
+              <InfoCircleOutlined className="text-3xl flex items-center" />
+              <h1>Találtunk már ilyen szobát:</h1>
             </label>
             <div className="flex justify-start ">
               <div
                 onClick={navigateToChatRoom}
-                className="flex gap-3 justify-between flex-row items-center text-lg bg-gray-200/70 p-2 rounded-xl min-w-[200px] cursor-pointer"
+                className="flex flex-row bg-gray-200/70 p-2 rounded-xl min-w-[200px] cursor-pointer w-full hover:bg-gray-300/50 hover:outline hover:outline-1 hover:outline-gray-200"
               >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={userImg}
-                    alt=""
-                    className="rounded-full w-11 h-11"
-                  />
-                  <div>{existsRoom.name}</div>
-                </div>
-                <div className="hover:bg-gray-300 hover:cursor-pointer hover:rounded-full px-2 py-1 flex items-center">
-                  <DeleteOutlined className="text-red-800 text-xl " />
+                <div className="flex gap-4">
+                  <div>
+                    <img
+                      src={userImg}
+                      className="rounded-full w-20 h-20"
+                      alt="ChatImg"
+                    />
+                  </div>
+
+                  <div className="flex flex-col justify-around">
+                    <h1 className="text-gray-800 text-2xl">
+                      {existsRoom.name}
+                    </h1>
+                    <p className="text-gray-600">
+                      {existsRoom.participants.length - 1} emberrel
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

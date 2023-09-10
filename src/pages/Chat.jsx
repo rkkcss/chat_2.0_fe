@@ -75,17 +75,21 @@ export const Chat = () => {
         <div className="h-full border rounded-lg overflow-y-auto">
           <div className="border-b pb-3 p-4">
             <div className="flex justify-between items-start">
-              <h1 className="font-bold text-2xl mb-3">Messages</h1>
+              <h1 className="font-bold text-2xl mb-3 text-gray-700">
+                Üzenetek
+              </h1>
               <div className="flex gap-2">
                 <Link to={"/chat/new"}>
                   <PlusCircleOutlined
-                    className="text-2xl 
+                    className="text-2xl
+                    text-gray-700 
                 hover:cursor-pointer 
                 hover:text-green-300"
                   />
                 </Link>
                 <SearchOutlined
                   className={`text-2xl 
+                  text-gray-700 
                 hover:cursor-pointer 
                 hover:text-green-300`}
                   onClick={() => setSearchingMessage(!isSearchingMessage)}
