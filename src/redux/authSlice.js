@@ -3,10 +3,11 @@ import { API } from '../axios/API';
 import { toast } from 'react-toastify';
 import { APILogin } from '../axios/APILogin';
 
+//TODO:handle when I use multiple http request
+
 const initialState = {
     user: null,
     loading: false,
-    msg: "",
     error: false,
     theme: "light",
 }
@@ -34,8 +35,12 @@ export const logoutUser = createAsyncThunk('logoutUser', async () => {
         window.location.href = '/login'
         //toast.success('Sikeres kijelentkezés');
     });
-    console.log('logout',result)
     return result;
+});
+
+export const updateUserApi = createAsyncThunk("updateUser", async (user ,{dispatch}) => {
+    const result = await API.post('/api/account', user).then(res => {
+    }).then(res => dispatch(getAccountInfo()));
 });
 
 const loginSlice = createSlice({
@@ -50,7 +55,10 @@ const loginSlice = createSlice({
         },
         toggleTheme(state, action) {
             state.theme = action.payload;
-        }
+        },
+        updateUser(state, action) {
+            state.user = {...state.user, [action.payload.name]: action.payload.value}
+        },
     },
     extraReducers(builder) {
         builder
@@ -85,9 +93,17 @@ const loginSlice = createSlice({
             .addCase(logoutUser.pending, (state) => {
                 state.loading = true
             })
+            //update user handling
+            .addCase(updateUserApi.fulfilled, (state, action) => {
+                toast.success("Sikeren frissítettük az adataidat!");
+            })
+            .addCase(updateUserApi.rejected, (state, action) => {
+                console.log("updateerror", state)
+                console.log("updateerror", action)
+            })
     }
 });
 
-export const { loadingTrue, loadingFalse, toggleTheme} = loginSlice.actions;
+export const { loadingTrue, loadingFalse, toggleTheme, updateUser} = loginSlice.actions;
 
 export default loginSlice.reducer;

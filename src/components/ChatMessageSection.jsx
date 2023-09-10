@@ -30,6 +30,12 @@ export const ChatMessagesSection = () => {
   const [messages, setMessages] = useState([]);
   const ourSelf = useSelector((state) => state.userStore.user);
 
+  const [pagination, setPagination] = useState({
+    totalElements: 0,
+    totalPages: 0,
+    page: 0,
+  });
+
   const isAnyUserOnline = useIsAnyUserOnline(
     ourSelf,
     activeUsers,
@@ -38,11 +44,8 @@ export const ChatMessagesSection = () => {
 
   useEffect(() => {
     socket?.current?.on("userStartTypingToClient", (res) => {
-      console.log("typing", res);
-
       if (res.roomId == roomId && ourSelf.id != res.user.id) {
         setIsUserTyping(true);
-        console.log("bent");
       }
     });
     socket?.current?.on("userStopTypingToClient", () => {
@@ -50,11 +53,23 @@ export const ChatMessagesSection = () => {
     });
   }, [socket.current]);
 
-  useEffect(() => {
-    API.get(`/api/messages/room/${roomId}`).then((res) => {
-      setMessages(res.data);
+  const fetchMessages = async (pageNumber) => {
+    await API.get(`/api/messages/room/${roomId}`, {
+      params: { page: pageNumber },
+    }).then((res) => {
       console.log(res.data);
+      setMessages(res?.data?.content);
+      setPagination((prev) => ({
+        ...prev,
+        totalElements: res.data.totalElements,
+        totalPages: res.data.totalPages,
+        page: res.data.number,
+      }));
     });
+  };
+
+  useEffect(() => {
+    fetchMessages(0);
   }, [roomId]);
 
   useEffect(() => {

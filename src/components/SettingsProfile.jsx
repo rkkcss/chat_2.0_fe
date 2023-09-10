@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import userImg from "../assets/user.jpg";
 import {
   CameraOutlined,
@@ -7,15 +7,16 @@ import {
   SaveOutlined,
 } from "@ant-design/icons";
 import { API } from "../axios/API";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser, updateUserApi } from "../redux/authSlice";
 
 export const SettingsProfile = () => {
-  const [user, setUser] = useState({});
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state?.userStore?.user);
 
   useEffect(() => {
-    API.get("api/account").then((res) => {
-      setUser(res.data);
-    });
-  }, []);
+    console.log("user in hook", user);
+  }, [user]);
   return (
     <>
       <h1 className="text-2xl mb-8">Saját profil</h1>
@@ -36,11 +37,13 @@ export const SettingsProfile = () => {
             </label>
             <input
               type="text"
-              name="username"
+              name="login"
               value={user?.login}
               className="mt-3 shadow border rounded-xl w-full px-2.5 py-2.5 text-gray-700 leading-tight focus:outline-emerald-100 focus:shadow-outline"
               placeholder="Írd a felhasználóneved..."
-              required
+              onChange={(e) =>
+                dispatch(updateUser({ value: e.target.value, name: "login" }))
+              }
             />
           </div>
         </div>
@@ -55,7 +58,11 @@ export const SettingsProfile = () => {
               value={user?.firstName}
               className="mt-2 shadow border rounded-xl w-full px-2.5 py-2.5 text-gray-700 leading-tight focus:outline-emerald-100 focus:shadow-outline"
               placeholder="Írd a vezetéknéved..."
-              required
+              onChange={(e) =>
+                dispatch(
+                  updateUser({ value: e.target.value, name: "firstName" })
+                )
+              }
             />
           </div>
           <div className="w-full">
@@ -68,38 +75,20 @@ export const SettingsProfile = () => {
               value={user?.lastName}
               className="mt-2 shadow border rounded-xl w-full px-2.5 py-2.5 text-gray-700 leading-tight focus:outline-emerald-100 focus:shadow-outline"
               placeholder="Írd a keresztneved..."
-              required
+              onChange={(e) =>
+                dispatch(
+                  updateUser({ value: e.target.value, name: "lastName" })
+                )
+              }
             />
           </div>
         </div>
-        <div className="flex gap-8">
-          <div className="w-full">
-            <label className="text-lg font-medium text-gray-600">
-              Vezetéknév
-            </label>
-            <input
-              type="text"
-              name="fistName"
-              className="mt-2 shadow border rounded-xl w-full px-2.5 py-2.5 text-gray-700 leading-tight focus:outline-emerald-100 focus:shadow-outline"
-              placeholder="Írd a vezetéknéved..."
-              required
-            />
-          </div>
-          <div className="w-full">
-            <label className="text-lg font-medium text-gray-600">
-              Keresztnév
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              className="mt-2 shadow border rounded-xl w-full px-2.5 py-2.5 text-gray-700 leading-tight focus:outline-emerald-100 focus:shadow-outline"
-              placeholder="Írd a keresztneved..."
-              required
-            />
-          </div>
-        </div>
+
         <div className="flex gap-3 justify-end">
-          <button className="flex items-center gap-2 text-sm font-medium rounded-xl border px-4 py-1.5 bg-emerald-300 text-gray-900 hover:bg-emerald-400 border-emerald-400">
+          <button
+            onClick={() => dispatch(updateUserApi(user))}
+            className="flex items-center gap-2 text-sm font-medium rounded-xl border px-4 py-1.5 bg-emerald-300 text-gray-900 hover:bg-emerald-400 border-emerald-400"
+          >
             <SaveOutlined />
             Mentés
           </button>
