@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import userImg from "../assets/user.jpg";
 import {
   ArrowLeftOutlined,
@@ -18,23 +18,45 @@ import dayjs from "dayjs";
 import * as relativeTime from "dayjs/plugin/relativeTime";
 import { Message } from "./Message";
 import InputEmoji from "react-input-emoji";
+import { FileSvg } from "../assets/svg/FileSvg";
+import { Axios } from "axios";
 
 export const ChatMessagesSection = () => {
   dayjs.extend(relativeTime);
   const { room, activeUsers, socket } = useOutletContext();
-  const scrollRef = useRef();
   const [messageInput, setMessageInput] = useState("");
 
   const [isUserTyping, setIsUserTyping] = useState(false);
   const { roomId } = useParams();
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(new Map());
   const ourSelf = useSelector((state) => state.userStore.user);
 
   const [pagination, setPagination] = useState({
     totalElements: 0,
     totalPages: 0,
     page: 0,
+    last: false,
   });
+  const [loading, setLoading] = useState(false);
+
+  const observer = useRef();
+  const lastMessageRef = useCallback(
+    (element) => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !pagination.last) {
+          setPagination((prev) => ({ ...prev, page: prev.page + 1 }));
+          console.log("itt vagyunk!");
+        }
+      });
+      if (element) {
+        observer.current.observe(element);
+      }
+    },
+    [pagination.last]
+  );
 
   const isAnyUserOnline = useIsAnyUserOnline(
     ourSelf,
@@ -54,21 +76,39 @@ export const ChatMessagesSection = () => {
   }, [socket.current]);
 
   const fetchMessages = async (pageNumber) => {
+    setLoading(true);
     await API.get(`/api/messages/room/${roomId}`, {
       params: { page: pageNumber },
-    }).then((res) => {
-      console.log(res.data);
-      setMessages(res?.data?.content);
-      setPagination((prev) => ({
-        ...prev,
-        totalElements: res.data.totalElements,
-        totalPages: res.data.totalPages,
-        page: res.data.number,
-      }));
-    });
+    })
+      .then((res) => {
+        console.log(res.data.content);
+        setMessages(
+          (prev) =>
+            new Map([...prev, ...res.data.content.map((msg) => [msg.id, msg])])
+        );
+
+        console.log("uj", messages);
+        setPagination((prev) => ({
+          ...prev,
+          totalElements: res.data.totalElements,
+          totalPages: res.data.totalPages,
+          page: res.data.number,
+          last: res.data.last,
+        }));
+      })
+      .finally((e) => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
+    setTimeout(() => {
+      fetchMessages(pagination.page);
+    }, [500]);
+  }, [pagination.page]);
+
+  useEffect(() => {
+    setMessages(new Map());
     fetchMessages(0);
   }, [roomId]);
 
@@ -76,22 +116,24 @@ export const ChatMessagesSection = () => {
     socket?.current?.emit("joinRoom", { roomId: roomId });
   }, [socket.current, roomId]);
 
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
   //save message to db and send to the group via socket
   const sendMessageAndSave = () => {
+    if (messageInput == "" || messageInput == null || messageInput == undefined)
+      return;
     API.post(`/api/messages/${roomId}`, {
       text: messageInput,
+    }).then((res) => {
+      console.log("before sending user", res);
+      socket.current?.emit("groupMessageToServer", {
+        user: ourSelf,
+        text: res?.data?.text,
+        id: res?.data?.id,
+        //TODO: need to check the error in BE
+        // createdDate: res?.data?.createdDate,
+        roomId: roomId,
+      });
     });
-    socket.current?.emit("groupMessageToServer", {
-      user: {
-        id: ourSelf.id,
-      },
-      text: messageInput,
-      roomId: roomId,
-    });
+
     setMessageInput("");
   };
 
@@ -118,7 +160,9 @@ export const ChatMessagesSection = () => {
 
   useEffect(() => {
     socket?.current?.on("groupMessageToClient", (data) => {
-      setMessages([...messages, data]);
+      setMessages(
+        (prevMessages) => new Map([[data.id, data], ...prevMessages])
+      );
     });
   });
 
@@ -158,11 +202,20 @@ export const ChatMessagesSection = () => {
           </div>
         </div>
 
-        <div className="flex-grow p-6 overflow-y-auto relative">
-          {messages?.map((message, i) => (
-            <Message message={message} key={i} scrollRef={scrollRef} />
-          ))}
+        <div className="flex-grow p-6 overflow-y-auto relative flex flex-col-reverse">
+          {}
 
+          {Array.from(messages.values()).map((message, i) =>
+            i + 1 === messages.size ? (
+              <Message
+                message={message}
+                key={message.id}
+                lastMessageRef={lastMessageRef}
+              />
+            ) : (
+              <Message message={message} key={message.id} />
+            )
+          )}
           <div className={`${isUserTyping ? "block" : "hidden"}`}>
             <span className="flex items-center gap-2 left-3">
               <img src={userImg} alt="" className="w-6 h-6 rounded-full" />

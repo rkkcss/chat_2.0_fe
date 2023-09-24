@@ -1,22 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import userImg from "../assets/user.jpg";
-import {
-  CameraOutlined,
-  DeleteOutlined,
-  EditFilled,
-  SaveOutlined,
-} from "@ant-design/icons";
-import { API } from "../axios/API";
+import { CameraOutlined, SaveOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser, updateUserApi } from "../redux/authSlice";
+import { getAccountInfo, updateUser, updateUserApi } from "../redux/authSlice";
 
 export const SettingsProfile = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.userStore?.user);
 
   useEffect(() => {
-    console.log("user in hook", user);
-  }, [user]);
+    return () => {
+      dispatch(getAccountInfo());
+    };
+  }, []);
+
   return (
     <>
       <h1 className="text-2xl mb-8">Saját profil</h1>
