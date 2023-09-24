@@ -18,8 +18,7 @@ import dayjs from "dayjs";
 import * as relativeTime from "dayjs/plugin/relativeTime";
 import { Message } from "./Message";
 import InputEmoji from "react-input-emoji";
-import { FileSvg } from "../assets/svg/FileSvg";
-import { Axios } from "axios";
+import usePagination from "../hooks/usePaginationHook";
 
 export const ChatMessagesSection = () => {
   dayjs.extend(relativeTime);
@@ -31,32 +30,8 @@ export const ChatMessagesSection = () => {
   const [messages, setMessages] = useState(new Map());
   const ourSelf = useSelector((state) => state.userStore.user);
 
-  const [pagination, setPagination] = useState({
-    totalElements: 0,
-    totalPages: 0,
-    page: 0,
-    last: false,
-  });
-  const [loading, setLoading] = useState(false);
-
-  const observer = useRef();
-  const lastMessageRef = useCallback(
-    (element) => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && !pagination.last) {
-          setPagination((prev) => ({ ...prev, page: prev.page + 1 }));
-          console.log("itt vagyunk!");
-        }
-      });
-      if (element) {
-        observer.current.observe(element);
-      }
-    },
-    [pagination.last]
-  );
+  const { pagination, setPagination, loading, lastElementRef, setLoading } =
+    usePagination();
 
   const isAnyUserOnline = useIsAnyUserOnline(
     ourSelf,
@@ -76,7 +51,6 @@ export const ChatMessagesSection = () => {
   }, [socket.current]);
 
   const fetchMessages = async (pageNumber) => {
-    setLoading(true);
     await API.get(`/api/messages/room/${roomId}`, {
       params: { page: pageNumber },
     })
@@ -86,22 +60,16 @@ export const ChatMessagesSection = () => {
           (prev) =>
             new Map([...prev, ...res.data.content.map((msg) => [msg.id, msg])])
         );
-
+        setPagination((prev) => ({ ...prev, last: res.data.last }));
         console.log("uj", messages);
-        setPagination((prev) => ({
-          ...prev,
-          totalElements: res.data.totalElements,
-          totalPages: res.data.totalPages,
-          page: res.data.number,
-          last: res.data.last,
-        }));
       })
-      .finally((e) => {
-        setLoading(false);
-      });
+      .finally((e) => {});
   };
 
   useEffect(() => {
+    if (pagination.page === 0) {
+      return;
+    }
     setTimeout(() => {
       fetchMessages(pagination.page);
     }, [500]);
@@ -109,6 +77,7 @@ export const ChatMessagesSection = () => {
 
   useEffect(() => {
     setMessages(new Map());
+    setPagination((prev) => ({ ...prev, page: 0 }));
     fetchMessages(0);
   }, [roomId]);
 
@@ -203,14 +172,12 @@ export const ChatMessagesSection = () => {
         </div>
 
         <div className="flex-grow p-6 overflow-y-auto relative flex flex-col-reverse">
-          {}
-
           {Array.from(messages.values()).map((message, i) =>
             i + 1 === messages.size ? (
               <Message
                 message={message}
                 key={message.id}
-                lastMessageRef={lastMessageRef}
+                lastMessageRef={lastElementRef}
               />
             ) : (
               <Message message={message} key={message.id} />

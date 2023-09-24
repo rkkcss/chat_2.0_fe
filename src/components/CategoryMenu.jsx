@@ -8,12 +8,7 @@ import {
   SettingOutlined,
   LaptopOutlined,
 } from "@ant-design/icons";
-import {
-  Link,
-  useLocation,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import moonIcon from "../assets/moon-icon.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/authSlice";
@@ -21,26 +16,32 @@ import { toggleTheme } from "../redux/authSlice";
 export const CategoryMenu = () => {
   const { theme } = useSelector((state) => state.userStore);
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  //checking the current path is matches with the menutItem link
+  const isMenuItemActive = (menuItem) => {
+    return "/" + location.pathname.split("/")[1] == menuItem.link;
+  };
 
   const menuItems = [
     {
       id: "1",
-      icon: <HomeOutlined className="text-3xl" />,
+      icon: <HomeOutlined className="text-3xl leading-7" />,
       link: "/",
     },
     {
       id: "2",
-      icon: <MessageOutlined className="text-3xl" />,
+      icon: <MessageOutlined className="text-3xl leading-7" />,
       link: "/chat",
     },
     {
       id: "3",
-      icon: <LaptopOutlined className="text-3xl" />,
+      icon: <LaptopOutlined className="text-3xl leading-7" />,
       link: "/game",
     },
     {
       id: "4",
-      icon: <SettingOutlined className="text-3xl" />,
+      icon: <SettingOutlined className="text-3xl leading-7" />,
       link: "/settings",
     },
   ];
@@ -58,13 +59,22 @@ export const CategoryMenu = () => {
           className="w-12 h-12 rounded-full mx-auto"
         />
       </div>
-      <div className="text-gray-400 flex flex-col">
+      <div className="text-gray-400 flex flex-col gap-3 px-1">
         {menuItems.map((menuItem) => {
           return (
             <Link
               key={menuItem.id}
               to={menuItem.link}
-              className="hover:text-emerald-400 hover:cursor-pointer shadow-slate-600 w-full justify-center align-middle flex py-3"
+              className={`
+              shadow-slate-600 w-full 
+              justify-center align-middle 
+              flex p-2 
+              ${
+                isMenuItemActive(menuItem)
+                  ? "bg-emerald-300 text-gray-700 rounded-lg"
+                  : "hover:rounded-lg hover:bg-gray-100 hover:cursor-pointer hover:text-gray-700"
+              }
+              `}
             >
               {menuItem.icon}
             </Link>

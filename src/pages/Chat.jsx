@@ -90,7 +90,7 @@ export const Chat = () => {
                 <SearchOutlined
                   className={`text-2xl 
                   text-gray-700 
-                hover:cursor-pointer 
+                  hover:cursor-pointer 
                 hover:text-green-300`}
                   onClick={() => setSearchingMessage(!isSearchingMessage)}
                 />
@@ -107,7 +107,7 @@ export const Chat = () => {
             {rooms.map((room) => (
               <Link
                 to={"/chat/" + room.id}
-                className="flex flex-row hover:cursor-pointer hover:bg-gray-100/60 p-4"
+                className="flex flex-row hover:cursor-pointer hover:bg-gray-100/60 p-4 hover:bg-green-300"
                 key={room.id}
                 onClick={() => setSelectedRoom(room)}
               >
