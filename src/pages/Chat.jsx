@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { SearchInUsers } from "../components/SearchInUsers";
 import { NewChat } from "../modals/NewChat";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 
 export const Chat = () => {
   const socket = useRef();
@@ -18,6 +18,10 @@ export const Chat = () => {
   const ourSelf = useSelector((state) => state.userStore.user);
   const [searchInput, setSearchInput] = useState("");
   const [activeUsers, setActiveUsers] = useState([]);
+  const location = useLocation().pathname.split("/")[2];
+  console.log({ location });
+
+  const isChatActive = () => {};
 
   useEffect(() => {
     socket.current = io("ws://192.168.0.26:8085");
@@ -41,25 +45,16 @@ export const Chat = () => {
     };
   }, []);
 
-  useEffect(() => {
-    rooms.filter((room) => {
-      if (room.id == roomId) {
-        setSelectedRoom(room);
-      }
-    });
-  }, [rooms]);
-
   //add userid to server when connected
   useEffect(() => {
     socket.current.emit("getUserId", ourSelf.id);
   }, []);
-
+  console.log({ selectedRoom });
   const searchUsers = (e) => {
     setSearchInput(e.target.value);
 
     setTimeout(() => {
       API.get(`/api/users/search?searchName=${searchInput}`).then((res) => {
-        console.log("search result", res);
         setRooms(res.data);
       });
     }, 500);
@@ -107,7 +102,11 @@ export const Chat = () => {
             {rooms.map((room) => (
               <Link
                 to={"/chat/" + room.id}
-                className="flex flex-row hover:cursor-pointer hover:bg-gray-100/60 p-4 hover:bg-green-300"
+                className={`flex flex-row hover:cursor-pointer mx-2 p-4 ${
+                  room.id == location
+                    ? "bg-emerald-300 rounded-lg"
+                    : "hover:bg-gray-100 rounded-lg"
+                }`}
                 key={room.id}
                 onClick={() => setSelectedRoom(room)}
               >
