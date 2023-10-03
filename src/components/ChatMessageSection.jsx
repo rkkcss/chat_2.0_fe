@@ -5,6 +5,7 @@ import {
   EllipsisOutlined,
   FileImageOutlined,
   GifOutlined,
+  LeftOutlined,
   SmileOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
@@ -13,7 +14,12 @@ import { API } from "../axios/API";
 import { useSelector } from "react-redux";
 import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
 import { TypeingDots } from "../assets/TypingDots/TypeingDots";
-import { useOutletContext, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useOutletContext,
+  useParams,
+} from "react-router-dom";
 import dayjs from "dayjs";
 import * as relativeTime from "dayjs/plugin/relativeTime";
 import { Message } from "./Message";
@@ -22,7 +28,9 @@ import usePagination from "../hooks/usePaginationHook";
 
 export const ChatMessagesSection = () => {
   dayjs.extend(relativeTime);
-  const { room, activeUsers, socket } = useOutletContext();
+  const navigate = useNavigate();
+
+  const { room, activeUsers, socket, setSelectedRoom } = useOutletContext();
   const [messageInput, setMessageInput] = useState("");
 
   const [isUserTyping, setIsUserTyping] = useState(false);
@@ -135,13 +143,21 @@ export const ChatMessagesSection = () => {
     });
   });
 
+  const navigateBackToChatSelection = () => {
+    setSelectedRoom({});
+    navigate("/chat");
+  };
+
   return (
     <>
       <div className="h-full flex flex-col">
         <div className="py-3 pl-5 pr-6 border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center text-4xl gap-2">
-              <ArrowLeftOutlined className="lg:hidden text-black cursor-pointer" />
+              <LeftOutlined
+                className="lg:hidden text-black cursor-pointer"
+                onClick={() => navigateBackToChatSelection()}
+              />
               <img
                 src={userImg}
                 alt=""

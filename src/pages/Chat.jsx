@@ -5,8 +5,7 @@ import { ChatRoom } from "../components/ChatRoom";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { SearchInUsers } from "../components/SearchInUsers";
-import { NewChat } from "../modals/NewChat";
-import { Link, Outlet, useLocation, useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 
 export const Chat = () => {
   const socket = useRef();
@@ -18,10 +17,6 @@ export const Chat = () => {
   const ourSelf = useSelector((state) => state.userStore.user);
   const [searchInput, setSearchInput] = useState("");
   const [activeUsers, setActiveUsers] = useState([]);
-  const location = useLocation().pathname.split("/")[2];
-  console.log({ location });
-
-  const isChatActive = () => {};
 
   useEffect(() => {
     socket.current = io("ws://192.168.0.26:8085");
@@ -49,7 +44,7 @@ export const Chat = () => {
   useEffect(() => {
     socket.current.emit("getUserId", ourSelf.id);
   }, []);
-  console.log({ selectedRoom });
+
   const searchUsers = (e) => {
     setSearchInput(e.target.value);
 
@@ -60,11 +55,19 @@ export const Chat = () => {
     }, 500);
   };
 
+  useEffect(() => {
+    return rooms.find((room) => {
+      if (room.id == roomId) {
+        return setSelectedRoom(room);
+      }
+    });
+  }, [rooms, roomId]);
+
   return (
     <>
       <div
-        className={`max-w-[500px] min-w-[500px] border-r-2 p-7 ${
-          false ? "hidden lg:block" : ""
+        className={`sm:min-w-[500px] lg:max-w-[500px] w-screen border-r-2 p-7 ${
+          roomId && "hidden lg:block"
         }`}
       >
         <div className="h-full border rounded-lg overflow-y-auto">
@@ -103,7 +106,7 @@ export const Chat = () => {
               <Link
                 to={"/chat/" + room.id}
                 className={`flex flex-row hover:cursor-pointer mx-2 p-4 ${
-                  room.id == location
+                  room.id == roomId
                     ? "bg-emerald-300 rounded-lg"
                     : "hover:bg-gray-100 rounded-lg"
                 }`}
@@ -121,7 +124,11 @@ export const Chat = () => {
         </div>
       </div>
 
-      <div className={`min-h-screen w-full`}>
+      <div
+        className={`min-h-screen w-full ${
+          selectedRoom.id ? "block" : "hidden"
+        }`}
+      >
         <div className="h-full flex flex-col">
           <Outlet
             context={{
