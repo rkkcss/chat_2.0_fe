@@ -19,7 +19,7 @@ export const ConfirmRegistration = () => {
   const location = useLocation();
   const [queryParams] = useSearchParams();
   const [error, setError] = useState("");
-
+  console.log({ queryParams });
   useEffect(() => {
     API.get(`api/activate?key=${queryParams.get("key")}`)
       .then((res) => res.data)

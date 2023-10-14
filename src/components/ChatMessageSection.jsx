@@ -32,7 +32,6 @@ export const ChatMessagesSection = () => {
 
   const { room, activeUsers, socket, setSelectedRoom } = useOutletContext();
   const [messageInput, setMessageInput] = useState("");
-
   const [isUserTyping, setIsUserTyping] = useState(false);
   const { roomId } = useParams();
   const [messages, setMessages] = useState(new Map());
@@ -48,12 +47,12 @@ export const ChatMessagesSection = () => {
   );
 
   useEffect(() => {
-    socket?.current?.on("userStartTypingToClient", (res) => {
+    socket?.current.on("userStartTypingToClient", (res) => {
       if (res.roomId == roomId && ourSelf.id != res.user.id) {
         setIsUserTyping(true);
       }
     });
-    socket?.current?.on("userStopTypingToClient", () => {
+    socket?.current.on("userStopTypingToClient", () => {
       setIsUserTyping(false);
     });
   }, [socket.current]);
@@ -69,7 +68,6 @@ export const ChatMessagesSection = () => {
             new Map([...prev, ...res.data.content.map((msg) => [msg.id, msg])])
         );
         setPagination((prev) => ({ ...prev, last: res.data.last }));
-        console.log("uj", messages);
       })
       .finally((e) => {});
   };
@@ -90,7 +88,7 @@ export const ChatMessagesSection = () => {
   }, [roomId]);
 
   useEffect(() => {
-    socket?.current?.emit("joinRoom", { roomId: roomId });
+    socket?.current.emit("joinRoom", { roomId: roomId });
   }, [socket.current, roomId]);
 
   //save message to db and send to the group via socket
@@ -101,7 +99,7 @@ export const ChatMessagesSection = () => {
       text: messageInput,
     }).then((res) => {
       console.log("before sending user", res);
-      socket.current?.emit("groupMessageToServer", {
+      socket?.current.emit("groupMessageToServer", {
         user: ourSelf,
         text: res?.data?.text,
         id: res?.data?.id,
@@ -118,7 +116,7 @@ export const ChatMessagesSection = () => {
   const userTypeingHandler = (e) => {
     setMessageInput(e);
 
-    socket?.current?.emit("userStartTypingToServer", {
+    socket?.current.emit("userStartTypingToServer", {
       user: {
         id: ourSelf?.id,
       },
@@ -126,7 +124,7 @@ export const ChatMessagesSection = () => {
     });
 
     setTimeout(() => {
-      socket?.current?.emit("userStopTypingToServer", {
+      socket?.current.emit("userStopTypingToServer", {
         user: {
           id: ourSelf?.id,
         },
@@ -136,7 +134,7 @@ export const ChatMessagesSection = () => {
   };
 
   useEffect(() => {
-    socket?.current?.on("groupMessageToClient", (data) => {
+    socket?.current.on("groupMessageToClient", (data) => {
       setMessages(
         (prevMessages) => new Map([[data.id, data], ...prevMessages])
       );

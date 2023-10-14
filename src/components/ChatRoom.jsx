@@ -25,10 +25,10 @@ export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
       <div className="flex flex-row justify-between w-full ml-4">
         <div>
           <p className="text-gray-700 font-medium text-xl">{room.name}</p>
-          {/* <span className="text-slate-400">text</span> */}
+          <span className="text-slate-400">{room.lastMessage?.text}</span>
         </div>
         <div className="flex items-start">
-          {/* <p>{moment(lastMessage.createdDate).calendar()}</p> */}
+          <p>{moment(room.lastMessage?.createdDate).calendar()}</p>
         </div>
       </div>
     </>

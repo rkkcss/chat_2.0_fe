@@ -1,48 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import { API } from "../axios/API";
 import { ChatRoom } from "../components/ChatRoom";
 import { useSelector } from "react-redux";
-import io from "socket.io-client";
 import { SearchInUsers } from "../components/SearchInUsers";
-import { Link, Outlet, useParams } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useOutletContext,
+  useParams,
+} from "react-router-dom";
 
 export const Chat = () => {
-  const socket = useRef();
-
+  const location = useLocation();
+  const { socket, activeUsers } = useOutletContext();
   const { roomId } = useParams();
   const [selectedRoom, setSelectedRoom] = useState({});
   const [isSearchingMessage, setSearchingMessage] = useState(false);
   const [rooms, setRooms] = useState([]);
   const ourSelf = useSelector((state) => state.userStore.user);
   const [searchInput, setSearchInput] = useState("");
-  const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
-    socket.current = io("ws://192.168.0.26:8085");
     API.get("/api/rooms").then((res) => {
       setRooms(res.data);
     });
-    const handleGetActiveUsers = (userList) => handleGetActiveUsers(userList);
-    const activeUsersListener = (userList) => {
-      const newList = Object.keys(userList).map((userId) => ({
-        id: userId,
-        sessionId: userList[userId],
-      }));
-      setActiveUsers(newList);
-    };
-
-    socket?.current.on("getActiveUsers", activeUsersListener);
-
-    return () => {
-      socket.current.off("getActiveUsers", activeUsersListener);
-      socket.current.disconnect();
-    };
-  }, []);
-
-  //add userid to server when connected
-  useEffect(() => {
-    socket.current.emit("getUserId", ourSelf.id);
   }, []);
 
   const searchUsers = (e) => {
@@ -67,7 +50,7 @@ export const Chat = () => {
     <>
       <div
         className={`sm:min-w-[500px] lg:max-w-[500px] w-screen border-r-2 p-7 ${
-          roomId && "hidden lg:block"
+          roomId || location.pathname == "/chat/new" ? "hidden lg:block" : ""
         }`}
       >
         <div className="h-full border rounded-lg overflow-y-auto">
@@ -126,7 +109,7 @@ export const Chat = () => {
 
       <div
         className={`min-h-screen w-full ${
-          selectedRoom.id ? "block" : "hidden"
+          roomId || location.pathname == "/chat/new" ? "block" : "hidden"
         }`}
       >
         <div className="h-full flex flex-col">

@@ -11,7 +11,7 @@ import Select from "react-tailwindcss-select";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 
-export const CreateNewChat = (props) => {
+export const CreateNewChat = () => {
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [existsRoom, setExistsRoom] = useState(null);
