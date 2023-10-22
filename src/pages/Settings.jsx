@@ -1,5 +1,12 @@
 import { Outlet } from "react-router-dom";
 import { SettingsMenuItems } from "../components/SettingsMenuItems";
+import {
+  DeleteFilled,
+  DeleteOutlined,
+  DeleteTwoTone,
+  PropertySafetyOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 
 export const Settings = () => {
   const menuItems = [
@@ -7,15 +14,18 @@ export const Settings = () => {
       id: 1,
       label: "Saját profil",
       link: "/settings/profile",
+      icon: <UserOutlined />,
     },
     {
       id: 2,
       label: "Biztonság",
       link: "/settings/security",
+      icon: <PropertySafetyOutlined />,
     },
     {
       id: 3,
       label: "Fiók törlése",
+      icon: <DeleteOutlined className="text-red-600" />,
     },
   ];
 
@@ -25,7 +35,7 @@ export const Settings = () => {
         <h1 className="px-4 py-3 text-2xl">Beállítások</h1>
         <div className="border h-screen border-gray-200 flex my-5 ml-11 rounded-lg">
           <div className="min-w-max border-r py-7">
-            <ul className="flex flex-col gap-8 w-80 text-lg ">
+            <ul className="w-80 text-lg ">
               {menuItems.map((item) => {
                 return <SettingsMenuItems menuItem={item} key={item.id} />;
               })}

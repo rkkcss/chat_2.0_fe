@@ -12,6 +12,7 @@ import { Link, useLocation } from "react-router-dom";
 import moonIcon from "../assets/moon-icon.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/authSlice";
+import { Tooltip } from "./Tooltip";
 
 export const CategoryMenu = () => {
   const { theme } = useSelector((state) => state.userStore);
@@ -28,21 +29,25 @@ export const CategoryMenu = () => {
       id: "1",
       icon: <HomeOutlined className="text-3xl leading-7" />,
       link: "/",
+      tooltip: "Kezdőoldal",
     },
     {
       id: "2",
       icon: <MessageOutlined className="text-3xl leading-7" />,
       link: "/chat",
+      tooltip: "Beszélgetések",
     },
     {
       id: "3",
       icon: <LaptopOutlined className="text-3xl leading-7" />,
       link: "/game",
+      tooltip: "Játék",
     },
     {
       id: "4",
       icon: <SettingOutlined className="text-3xl leading-7" />,
       link: "/settings",
+      tooltip: "Beállítások",
     },
   ];
 
@@ -59,29 +64,28 @@ export const CategoryMenu = () => {
           className="w-12 h-12 rounded-full mx-auto"
         />
       </div>
-      <div className="text-gray-400 flex flex-col gap-3 px-1">
+      <div className="text-gray-400 flex flex-col gap-5 px-1 items-center">
         {menuItems.map((menuItem) => {
           return (
-            <Link
-              key={menuItem.id}
-              to={menuItem.link}
-              className={`
-              shadow-slate-600 w-full 
-              justify-center align-middle 
-              flex p-2 
+            <Tooltip key={menuItem.id} tooltipMessage={menuItem.tooltip}>
+              <Link
+                to={menuItem.link}
+                className={`
+              shadow-slate-600 w-full p-3 
               ${
                 isMenuItemActive(menuItem)
                   ? "bg-emerald-300 text-gray-700 rounded-lg"
                   : "hover:rounded-lg hover:bg-gray-100 hover:cursor-pointer hover:text-gray-700"
               }
               `}
-            >
-              {menuItem.icon}
-            </Link>
+              >
+                {menuItem.icon}
+              </Link>
+            </Tooltip>
           );
         })}
       </div>
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4 mb-5">
         <div className="flex justify-center">
           {theme === "dark" ? (
             <img
@@ -99,12 +103,16 @@ export const CategoryMenu = () => {
             />
           )}
         </div>
-        <Link
-          to={"/logout"}
-          className="mb-6 text-gray-400 hover:text-emerald-400 hover:cursor-pointer shadow-slate-600 w-full flex justify-center"
-        >
-          <LogoutOutlined className="text-3xl" />
-        </Link>
+        <div className="flex justify-center">
+          <Tooltip tooltipMessage={"Kijelentkezés"}>
+            <Link
+              to={"/logout"}
+              className="text-gray-400 w-full p-3 hover:rounded-lg hover:bg-gray-100 hover:cursor-pointer hover:text-gray-700"
+            >
+              <LogoutOutlined className="text-3xl" />
+            </Link>
+          </Tooltip>
+        </div>
       </div>
     </div>
   );

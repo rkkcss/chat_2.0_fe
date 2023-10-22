@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.4",
+    "@cloudinary/react": "^1.11.2",
+    "@cloudinary/url-gen": "^1.11.2",
     "@reduxjs/toolkit": "^1.9.5",
     "dayjs": "^1.11.9",
     "emoji-picker-react": "^4.4.12",

@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import userImg from "../assets/user.jpg";
 import {
-  ArrowLeftOutlined,
+  CloseOutlined,
   EllipsisOutlined,
   FileImageOutlined,
   GifOutlined,
@@ -14,17 +14,13 @@ import { API } from "../axios/API";
 import { useSelector } from "react-redux";
 import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
 import { TypeingDots } from "../assets/TypingDots/TypeingDots";
-import {
-  Link,
-  useNavigate,
-  useOutletContext,
-  useParams,
-} from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import * as relativeTime from "dayjs/plugin/relativeTime";
 import { Message } from "./Message";
 import InputEmoji from "react-input-emoji";
 import usePagination from "../hooks/usePaginationHook";
+import axios from "axios";
 
 export const ChatMessagesSection = () => {
   dayjs.extend(relativeTime);
@@ -36,6 +32,7 @@ export const ChatMessagesSection = () => {
   const { roomId } = useParams();
   const [messages, setMessages] = useState(new Map());
   const ourSelf = useSelector((state) => state.userStore.user);
+  const [imageMessage, setImageMessage] = useState("");
 
   const { pagination, setPagination, loading, lastElementRef, setLoading } =
     usePagination();
@@ -92,11 +89,20 @@ export const ChatMessagesSection = () => {
   }, [socket.current, roomId]);
 
   //save message to db and send to the group via socket
-  const sendMessageAndSave = () => {
+  const sendMessageAndSave = async () => {
+    if (imageMessage) {
+      const imageUrl = await uploadImage();
+      postMessage(imageUrl);
+      return;
+    }
     if (messageInput == "" || messageInput == null || messageInput == undefined)
       return;
-    API.post(`/api/messages/${roomId}`, {
-      text: messageInput,
+    else postMessage(messageInput);
+  };
+
+  const postMessage = async (message) => {
+    await API.post(`/api/messages/${roomId}`, {
+      text: message,
     }).then((res) => {
       console.log("before sending user", res);
       socket?.current.emit("groupMessageToServer", {
@@ -108,7 +114,7 @@ export const ChatMessagesSection = () => {
         roomId: roomId,
       });
     });
-
+    setImageMessage("");
     setMessageInput("");
   };
 
@@ -146,6 +152,25 @@ export const ChatMessagesSection = () => {
     navigate("/chat");
   };
 
+  const handleImageMessage = (event, files) => {
+    if (files) {
+      setImageMessage(files[0]);
+    }
+    event.target.value = null;
+  };
+  const uploadImage = async () => {
+    const formData = new FormData();
+    formData.append("file", imageMessage);
+    formData.append("upload_preset", "ml_default");
+    return await axios
+      .post("https://api.cloudinary.com/v1_1/dmvkh8wxf/image/upload", formData)
+      .then((res) => {
+        if (res.status == 200) {
+          return res?.data.secure_url;
+        }
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <>
       <div className="h-full flex flex-col">
@@ -207,17 +232,44 @@ export const ChatMessagesSection = () => {
 
         <div className="w-full block border-t px-6 pb-4 border-gray-300">
           <div className="py-2 text-xl text-gray-400 gap-9 flex">
-            <FileImageOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
+            <div className="file-input-container flex items-center justify-center">
+              <label htmlFor="file-input" className="icon-container">
+                <FileImageOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
+              </label>
+              <input
+                type="file"
+                id="file-input"
+                className="hidden"
+                onChange={(event) =>
+                  handleImageMessage(event, event.target.files)
+                }
+              />
+            </div>
             <VideoCameraOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
             <GifOutlined className="hover:text-emerald-400 hover:cursor-pointer py-2" />
           </div>
           <div className="flex flex-grow gap-5 justify-between items-center w-full">
-            <InputEmoji
-              onChange={userTypeingHandler}
-              value={messageInput}
-              placeholder={"Aa"}
-            />
-
+            {imageMessage ? (
+              <div className={`relative`}>
+                <CloseOutlined
+                  className="hover:rounded-full absolute right-[-10px] top-[-10px] bg-gray-200 p-1 rounded-full hover:bg-gray-300 hover:cursor-pointer"
+                  onClick={() => setImageMessage("")}
+                />
+                <img
+                  src={URL.createObjectURL(imageMessage)}
+                  alt="asd"
+                  className="w-12 h-12 rounded-md"
+                />
+              </div>
+            ) : (
+              <div className="w-full">
+                <InputEmoji
+                  onChange={userTypeingHandler}
+                  value={messageInput}
+                  placeholder={"Aa"}
+                />
+              </div>
+            )}
             <div onClick={sendMessageAndSave}>
               <Button type={"primary"} text={"Küld"} />
             </div>

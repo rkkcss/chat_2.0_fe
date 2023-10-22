@@ -11,13 +11,13 @@ import {
   useOutletContext,
   useParams,
 } from "react-router-dom";
+import { Tooltip } from "../components/Tooltip";
 
 export const Chat = () => {
   const location = useLocation();
   const { socket, activeUsers } = useOutletContext();
   const { roomId } = useParams();
   const [selectedRoom, setSelectedRoom] = useState({});
-  const [isSearchingMessage, setSearchingMessage] = useState(false);
   const [rooms, setRooms] = useState([]);
   const ourSelf = useSelector((state) => state.userStore.user);
   const [searchInput, setSearchInput] = useState("");
@@ -53,13 +53,11 @@ export const Chat = () => {
           roomId || location.pathname == "/chat/new" ? "hidden lg:block" : ""
         }`}
       >
-        <div className="h-full border rounded-lg overflow-y-auto">
-          <div className="border-b pb-3 p-4">
-            <div className="flex justify-between items-start">
-              <h1 className="font-bold text-2xl mb-3 text-gray-700">
-                Üzenetek
-              </h1>
-              <div className="flex gap-2">
+        <div className="h-full border rounded-lg">
+          <div className="border-b py-4 px-4 flex items-center justify-between flex-col gap-3">
+            <div className="flex justify-between items-center w-full h-full">
+              <h1 className="font-bold text-2xl text-gray-700">Üzenetek</h1>
+              <Tooltip tooltipMessage={"Új üzenet"}>
                 <Link to={"/chat/new"}>
                   <PlusCircleOutlined
                     className="text-2xl
@@ -68,23 +66,14 @@ export const Chat = () => {
                 hover:text-green-300"
                   />
                 </Link>
-                <SearchOutlined
-                  className={`text-2xl 
-                  text-gray-700 
-                  hover:cursor-pointer 
-                hover:text-green-300`}
-                  onClick={() => setSearchingMessage(!isSearchingMessage)}
-                />
-              </div>
+              </Tooltip>
             </div>
-            {isSearchingMessage && (
-              <SearchInUsers
-                searchInput={searchInput}
-                handleInputChange={(e) => searchUsers(e)}
-              />
-            )}
+            <SearchInUsers
+              searchInput={searchInput}
+              handleInputChange={(e) => searchUsers(e)}
+            />
           </div>
-          <div className="">
+          <div className="overflow-y-auto h-[calc(100%-119px)]">
             {rooms.map((room) => (
               <Link
                 to={"/chat/" + room.id}
