@@ -21,7 +21,6 @@ import { SettingsSecurity } from "./components/SettingsSecurity";
 
 function App() {
   const { theme } = useSelector((state) => state.userStore);
-  console.log("TÉMA", theme);
 
   return (
     <div className={theme}>
