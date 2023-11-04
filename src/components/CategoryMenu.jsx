@@ -15,7 +15,7 @@ import { toggleTheme } from "../redux/authSlice";
 import { Tooltip } from "./Tooltip";
 
 export const CategoryMenu = () => {
-  const { theme } = useSelector((state) => state.userStore);
+  const { theme, user } = useSelector((state) => state.userStore);
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -59,7 +59,7 @@ export const CategoryMenu = () => {
     <div className="min-w-[64px] max-w-[64px] min-h-screen border-r-2 flex flex-col justify-between">
       <div>
         <img
-          src={user}
+          src={user.imageUrl}
           alt="User picture"
           className="w-12 h-12 rounded-full mx-auto"
         />

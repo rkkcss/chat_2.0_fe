@@ -21,6 +21,8 @@ import { Message } from "./Message";
 import InputEmoji from "react-input-emoji";
 import usePagination from "../hooks/usePaginationHook";
 import axios from "axios";
+import { uploadImage } from "../queries/fileUploadQueries";
+import { UserBubbleImageDisplayer } from "./UserBubbleImageDisplayer";
 
 export const ChatMessagesSection = () => {
   dayjs.extend(relativeTime);
@@ -33,6 +35,7 @@ export const ChatMessagesSection = () => {
   const [messages, setMessages] = useState(new Map());
   const ourSelf = useSelector((state) => state.userStore.user);
   const [imageMessage, setImageMessage] = useState("");
+  const [participantUsers, setParticipantUsers] = useState([]);
 
   const { pagination, setPagination, loading, lastElementRef, setLoading } =
     usePagination();
@@ -82,6 +85,7 @@ export const ChatMessagesSection = () => {
     setMessages(new Map());
     setPagination((prev) => ({ ...prev, page: 0 }));
     fetchMessages(0);
+    filterParticipantsForOnlyUsers();
   }, [roomId]);
 
   useEffect(() => {
@@ -91,7 +95,7 @@ export const ChatMessagesSection = () => {
   //save message to db and send to the group via socket
   const sendMessageAndSave = async () => {
     if (imageMessage) {
-      const imageUrl = await uploadImage();
+      const imageUrl = await uploadImage(imageMessage);
       postMessage(imageUrl);
       return;
     }
@@ -158,34 +162,25 @@ export const ChatMessagesSection = () => {
     }
     event.target.value = null;
   };
-  const uploadImage = async () => {
-    const formData = new FormData();
-    formData.append("file", imageMessage);
-    formData.append("upload_preset", "ml_default");
-    return await axios
-      .post("https://api.cloudinary.com/v1_1/dmvkh8wxf/image/upload", formData)
-      .then((res) => {
-        if (res.status == 200) {
-          return res?.data.secure_url;
-        }
-      })
-      .catch((err) => console.log(err));
+
+  const filterParticipantsForOnlyUsers = () => {
+    const participantList = room.participants.map((participant) => {
+      return { ...participant.user };
+    });
+    setParticipantUsers(participantList);
   };
+
   return (
     <>
       <div className="h-full flex flex-col">
         <div className="py-3 pl-5 pr-6 border-b">
           <div className="flex items-center justify-between">
-            <div className="flex items-center text-4xl gap-2">
-              <LeftOutlined
-                className="lg:hidden text-black cursor-pointer"
-                onClick={() => navigateBackToChatSelection()}
-              />
-              <img
-                src={userImg}
-                alt=""
-                className="rounded-full min-w-[50px] max-w-[50px] min-h-[50px] max-h-[50px]"
-              />
+            <LeftOutlined
+              className="lg:hidden mr-4 text-slate-700 text-2xl cursor-pointer"
+              onClick={() => navigateBackToChatSelection()}
+            />
+            <div className="relative">
+              <UserBubbleImageDisplayer users={participantUsers} />
             </div>
             <div className="w-full flex items-center justify-between ml-3">
               <div>
@@ -210,7 +205,7 @@ export const ChatMessagesSection = () => {
           </div>
         </div>
 
-        <div className="flex-grow p-6 overflow-y-auto relative flex flex-col-reverse">
+        <div className="flex-grow p-6 overflow-y-auto relative flex flex-col-reverse gap-2">
           {Array.from(messages.values()).map((message, i) =>
             i + 1 === messages.size ? (
               <Message

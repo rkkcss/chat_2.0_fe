@@ -49,14 +49,16 @@ export const Chat = () => {
   return (
     <>
       <div
-        className={`sm:min-w-[500px] lg:max-w-[500px] w-screen border-r-2 p-7 ${
+        className={`sm:min-w-[500px] lg:max-w-[500px] w-screen border-r-2 dark:border-zinc-600 p-7 ${
           roomId || location.pathname == "/chat/new" ? "hidden lg:block" : ""
         }`}
       >
-        <div className="h-full border rounded-lg">
+        <div className="h-full border rounded-lg dark:border-zinc-600">
           <div className="border-b py-4 px-4 flex items-center justify-between flex-col gap-3">
             <div className="flex justify-between items-center w-full h-full">
-              <h1 className="font-bold text-2xl text-gray-700">Üzenetek</h1>
+              <h1 className="font-bold text-2xl text-gray-700 dark:text-slate-100">
+                Üzenetek
+              </h1>
               <Tooltip tooltipMessage={"Új üzenet"}>
                 <Link to={"/chat/new"}>
                   <PlusCircleOutlined
@@ -79,8 +81,8 @@ export const Chat = () => {
                 to={"/chat/" + room.id}
                 className={`flex flex-row hover:cursor-pointer mx-2 p-4 ${
                   room.id == roomId
-                    ? "bg-emerald-300 rounded-lg"
-                    : "hover:bg-gray-100 rounded-lg"
+                    ? "bg-emerald-300 rounded-lg dark:bg-emerald-700"
+                    : "hover:bg-gray-100 rounded-lg dark:hover:bg-zinc-600"
                 }`}
                 key={room.id}
                 onClick={() => setSelectedRoom(room)}

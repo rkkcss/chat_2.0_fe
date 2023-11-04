@@ -1,12 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import userImg from "../assets/user.jpg";
-import { CameraOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+  CameraOutlined,
+  FileImageOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getAccountInfo, updateUser, updateUserApi } from "../redux/authSlice";
+import { uploadImage } from "../queries/fileUploadQueries";
 
 export const SettingsProfile = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.userStore?.user);
+  const [profileImage, setProfileImage] = useState("");
 
   useEffect(() => {
     return () => {
@@ -14,15 +20,33 @@ export const SettingsProfile = () => {
     };
   }, []);
 
+  //need better validation if image is not uploaded.
+  const handleProfileImage = async (event, files) => {
+    if (files) {
+      const image = await uploadImage(files[0]);
+      dispatch(updateUser({ value: image, name: "imageUrl" }));
+    }
+    event.target.value = null;
+  };
+
   return (
     <>
       <h1 className="text-2xl mb-8">Saját profil</h1>
       <div className="flex justify-center items-center my-5 ">
-        <div className="relative">
-          <img src={userImg} alt="" className="rounded-full w-32 h-32" />
-          <div className="absolute bottom-2 right-0">
-            <CameraOutlined className="p-2 bg-emerald-400 rounded-full hover:cursor-pointer" />
-          </div>
+        <div className="file-input-container flex items-center justify-center relative">
+          <img src={user.imageUrl} alt="" className="rounded-full w-32 h-32" />
+          <label
+            htmlFor="file-input"
+            className="icon-container absolute bottom-2 right-0"
+          >
+            <CameraOutlined className="bg-emerald-400 rounded-full hover:cursor-pointer p-2" />
+          </label>
+          <input
+            type="file"
+            id="file-input"
+            className="hidden"
+            onChange={(event) => handleProfileImage(event, event.target.files)}
+          />
         </div>
       </div>
       <div className="flex flex-col gap-10">

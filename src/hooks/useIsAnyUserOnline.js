@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function useIsAnyUserOnline(ourSelf, activeUsers, participants) {
   const [isAnyUserOnline, setIsAnyUserOnline] = useState(false);

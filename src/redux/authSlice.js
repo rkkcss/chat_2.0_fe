@@ -57,6 +57,8 @@ const loginSlice = createSlice({
             state.theme = action.payload;
         },
         updateUser(state, action) {
+            console.log('state',state);
+            console.log('action',action)
             state.user = {...state.user, [action.payload.name]: action.payload.value}
         },
     },

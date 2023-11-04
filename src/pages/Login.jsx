@@ -36,7 +36,7 @@ export const Login = () => {
       <div className="min-h-screen flex justify-center items-center gap-3">
         <img src={loginBg} alt="Login background image" />
         <form onSubmit={handleSubmit}>
-          <div className="min-w-[400px] grid gap-4 border-solid border border-gray-200 rounded-xl bg-gray-50 p-6">
+          <div className="min-w-[400px] grid gap-4 border-solid border border-gray-200 rounded-xl bg-gray-50 p-6 dark:bg-zinc-600">
             {error && (
               <div className="text-red-900 font-semibold gap-1 flex items-center bg-red-300 rounded-md py-3 pl-2">
                 <svg

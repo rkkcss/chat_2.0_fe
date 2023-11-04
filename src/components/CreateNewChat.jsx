@@ -10,6 +10,7 @@ import { API } from "../axios/API";
 import Select from "react-tailwindcss-select";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Divider } from "./Divider";
 
 export const CreateNewChat = () => {
   const [searchedUsers, setSearchedUsers] = useState([]);
@@ -114,9 +115,17 @@ export const CreateNewChat = () => {
         </div>
         {existsRoom && (
           <>
-            <label className="text-lg font-medium text-gray-600 flex items-center gap-3">
-              <InfoCircleOutlined className="text-3xl flex items-center" />
-              <h1>Találtunk már ilyen szobát:</h1>
+            <Divider text={"információ"} />
+            <label className="text-lg font-medium text-gray-600 border-2 bg-emerald-300 border-emerald-400 rounded-md p-2 ">
+              <span className="flex items-center gap-3 text-xl mb-2">
+                <InfoCircleOutlined className="text-3xl flex items-center" />
+                <span>Van találat</span>
+              </span>
+              <p className="text-sm">
+                Van már olyan szoba, ahol ezek a személyekkel beszélgetsz. Alább
+                találod meg a szobát és ha üzenni szeretnél nekik, kattints a
+                szobára.
+              </p>
             </label>
             <div className="flex justify-start ">
               <div

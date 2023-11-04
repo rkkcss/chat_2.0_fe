@@ -18,14 +18,18 @@ import { SettingsMenuItems } from "./components/SettingsMenuItems";
 import { SettingsProfile } from "./components/SettingsProfile";
 import { CreateNewChat } from "./components/CreateNewChat";
 import { SettingsSecurity } from "./components/SettingsSecurity";
+import moment from "moment/min/moment-with-locales";
 
 function App() {
   const { theme } = useSelector((state) => state.userStore);
 
+  //late when I have i18n I will need this
+  moment.locale("hu");
+
   return (
     <div className={theme}>
       <ToastContainer />
-      <div className="dark:bg-slate-900/80">
+      <div className="dark:bg-zinc-800/95">
         <Routes>
           <Route
             element={

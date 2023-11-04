@@ -3,36 +3,64 @@ import userImg from "../assets/user.jpg";
 import { useSelector } from "react-redux";
 import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
 import dayjs from "dayjs";
-import moment from "moment";
+import moment from "moment/min/moment-with-locales";
+import { UserBubbleImageDisplayer } from "./UserBubbleImageDisplayer";
+import useHandleRoomName from "../hooks/useHandleRoomName";
+
+const messageTypes = {
+  image: "Fényképet küldött",
+  empty: "Nincs még beszélgetés",
+};
 
 export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
+  const messageText = () => {
+    if (room.lastMessage?.text.includes("dmvkh8wxf")) {
+      return messageTypes.image;
+    } else if (
+      room.lastMessage?.text == undefined ||
+      room.lastMessage?.text == null
+    ) {
+      return messageTypes.empty;
+    }
+    return room.lastMessage?.text.slice(0, 40) + "...";
+  };
+
   const isAnyUserOnline = useIsAnyUserOnline(
     ourSelf,
     activeUsers,
     room.participants
   );
+  const [participantUsers, setParticipantUsers] = useState([]);
+
+  useEffect(() => {
+    const participantList = room.participants.map((participant) => {
+      return { ...participant.user };
+    });
+    setParticipantUsers(participantList);
+  }, []);
+  console.log({ room });
   return (
     <>
-      <div className="relative ">
-        <img
-          src={userImg}
-          className="rounded-full min-h-[64px] max-h-[64px] min-w-[64px] max-w-[64px]"
+      <div className="relative">
+        <UserBubbleImageDisplayer
+          users={participantUsers}
+          isOnlineBubble={isAnyUserOnline}
         />
-        {isAnyUserOnline == true && (
-          <span className="absolute top-1 right-1 p-1.5 bg-green-500 rounded-full"></span>
-        )}
       </div>
-      <div className="flex flex-row justify-between w-full ml-4">
-        <div>
-          <p className="text-gray-700 font-medium text-xl">{room.name}</p>
-          <span className="text-slate-400">
-            {room.lastMessage?.text.includes("dmvkh8wxf")
-              ? "Fényképet küldött"
-              : room.lastMessage?.text}
-          </span>
+      <div className="flex flex-col justify-between w-full ml-4">
+        <div className="flex justify-between">
+          <p className="text-gray-700 font-medium text-xl dark:text-slate-100">
+            {useHandleRoomName(room.name, room.participants)}
+          </p>
+          <p className="text-sm mt-1 dark:text-slate-100 text-gray-400">
+            {room.lastMessage?.createdDate &&
+              moment(room.lastMessage.createdDate).calendar()}
+          </p>
         </div>
         <div className="flex items-start">
-          <p>{moment(room.lastMessage?.createdDate).calendar()}</p>
+          <span className="text-slate-400 dark:text-slate-300">
+            {messageText()}
+          </span>
         </div>
       </div>
     </>
