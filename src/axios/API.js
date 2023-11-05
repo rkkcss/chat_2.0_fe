@@ -24,7 +24,7 @@ API.interceptors.response.use(
         return response;
     },
     error => {
-        console.log('error',error);
+        console.log('error',{error});
         if (error.response != null) {
             console.log('if 1')
             switch (error.response.status) {
@@ -39,7 +39,7 @@ API.interceptors.response.use(
                     break;
             }   
         }else{
-            window.location.href = '/login'
+            window.location.href = '/logout'
         }
         return Promise.reject(error);
     }

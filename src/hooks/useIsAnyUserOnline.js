@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 
-export default function useIsAnyUserOnline(ourSelf, activeUsers, participants) {
+export default function useIsAnyUserOnline(participants) {
   const [isAnyUserOnline, setIsAnyUserOnline] = useState(false);
+  const { activeUsers } = useSelector((state) => state.activeUsersStore);
+  const ourSelf = useSelector(state => state.userStore.user);
+  
   useEffect(() => {
     const anyOnline = activeUsers?.some((user) =>
       participants?.some(

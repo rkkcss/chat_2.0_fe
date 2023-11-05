@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
@@ -6,12 +6,10 @@ export const UserBubbleImageDisplayer = ({ users, isOnlineBubble }) => {
   const ourSelf = useSelector((state) => state.userStore.user);
   const [randomUserImages, setRandomUserImages] = useState([]);
 
-  useEffect(() => {
-    //console.log(users);
+  useLayoutEffect(() => {
     const imageList = users.filter((user) => {
       return user.id !== ourSelf.id;
     });
-    //console.log(imageList);
     setRandomUserImages(imageList);
   }, [users]);
 

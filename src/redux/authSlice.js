@@ -32,8 +32,6 @@ export const loginUser = createAsyncThunk('loginUser', async (user, { dispatch }
 
 export const logoutUser = createAsyncThunk('logoutUser', async () => {
     const result = await API.post('/api/logout',{}).then().then(res => {
-        window.location.href = '/login'
-        //toast.success('Sikeres kijelentkezés');
     });
     return result;
 });
@@ -94,6 +92,10 @@ const loginSlice = createSlice({
             })
             .addCase(logoutUser.pending, (state) => {
                 state.loading = true
+            })
+            .addCase(logoutUser.rejected, (state) => {
+                state.user = null;
+                state.loading = false;
             })
             //update user handling
             .addCase(updateUserApi.fulfilled, (state, action) => {

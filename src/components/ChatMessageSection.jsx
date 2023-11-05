@@ -1,50 +1,38 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import userImg from "../assets/user.jpg";
 import {
   CloseOutlined,
-  EllipsisOutlined,
   FileImageOutlined,
   GifOutlined,
-  LeftOutlined,
-  SmileOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button } from "./Button";
 import { API } from "../axios/API";
 import { useSelector } from "react-redux";
-import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
 import { TypeingDots } from "../assets/TypingDots/TypeingDots";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import * as relativeTime from "dayjs/plugin/relativeTime";
 import { Message } from "./Message";
 import InputEmoji from "react-input-emoji";
 import usePagination from "../hooks/usePaginationHook";
-import axios from "axios";
 import { uploadImage } from "../queries/fileUploadQueries";
-import { UserBubbleImageDisplayer } from "./UserBubbleImageDisplayer";
+import { ChatMessageSectionHeader } from "./ChatMessageSectionHeader";
 
 export const ChatMessagesSection = () => {
   dayjs.extend(relativeTime);
-  const navigate = useNavigate();
 
-  const { room, activeUsers, socket, setSelectedRoom } = useOutletContext();
+  const { selectedRoom } = useSelector((state) => state.roomStore);
+  const { socket } = useOutletContext();
   const [messageInput, setMessageInput] = useState("");
   const [isUserTyping, setIsUserTyping] = useState(false);
   const { roomId } = useParams();
   const [messages, setMessages] = useState(new Map());
   const ourSelf = useSelector((state) => state.userStore.user);
   const [imageMessage, setImageMessage] = useState("");
-  const [participantUsers, setParticipantUsers] = useState([]);
 
   const { pagination, setPagination, loading, lastElementRef, setLoading } =
     usePagination();
-
-  const isAnyUserOnline = useIsAnyUserOnline(
-    ourSelf,
-    activeUsers,
-    room?.participants
-  );
 
   useEffect(() => {
     socket?.current.on("userStartTypingToClient", (res) => {
@@ -85,7 +73,6 @@ export const ChatMessagesSection = () => {
     setMessages(new Map());
     setPagination((prev) => ({ ...prev, page: 0 }));
     fetchMessages(0);
-    filterParticipantsForOnlyUsers();
   }, [roomId]);
 
   useEffect(() => {
@@ -151,11 +138,6 @@ export const ChatMessagesSection = () => {
     });
   });
 
-  const navigateBackToChatSelection = () => {
-    setSelectedRoom({});
-    navigate("/chat");
-  };
-
   const handleImageMessage = (event, files) => {
     if (files) {
       setImageMessage(files[0]);
@@ -163,48 +145,11 @@ export const ChatMessagesSection = () => {
     event.target.value = null;
   };
 
-  const filterParticipantsForOnlyUsers = () => {
-    const participantList = room.participants.map((participant) => {
-      return { ...participant.user };
-    });
-    setParticipantUsers(participantList);
-  };
-
   return (
     <>
       <div className="h-full flex flex-col">
-        <div className="py-3 pl-5 pr-6 border-b">
-          <div className="flex items-center justify-between">
-            <LeftOutlined
-              className="lg:hidden mr-4 text-slate-700 text-2xl cursor-pointer"
-              onClick={() => navigateBackToChatSelection()}
-            />
-            <div className="relative">
-              <UserBubbleImageDisplayer users={participantUsers} />
-            </div>
-            <div className="w-full flex items-center justify-between ml-3">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-700">
-                  {room?.name}
-                </h1>
-
-                {isAnyUserOnline ? (
-                  <span className="text-sm text-emerald-500 font-bold">
-                    Elérhető
-                  </span>
-                ) : (
-                  <span className="text-sm text-gray-400 font-bold">
-                    Nem elérhető
-                  </span>
-                )}
-              </div>
-              <div className="text-4xl">
-                <EllipsisOutlined className="hover:bg-green-300 hover:cursor-pointer rounded-full border-2" />
-              </div>
-            </div>
-          </div>
-        </div>
-
+        {/* Chat message section header component */}
+        <ChatMessageSectionHeader />
         <div className="flex-grow p-6 overflow-y-auto relative flex flex-col-reverse gap-2">
           {Array.from(messages.values()).map((message, i) =>
             i + 1 === messages.size ? (

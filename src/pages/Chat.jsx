@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import { API } from "../axios/API";
 import { ChatRoom } from "../components/ChatRoom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { SearchInUsers } from "../components/SearchInUsers";
 import {
   Link,
@@ -12,15 +12,15 @@ import {
   useParams,
 } from "react-router-dom";
 import { Tooltip } from "../components/Tooltip";
+import { setSelectedRoom } from "../redux/roomSlice";
 
 export const Chat = () => {
   const location = useLocation();
-  const { socket, activeUsers } = useOutletContext();
+  const { socket } = useOutletContext();
   const { roomId } = useParams();
-  const [selectedRoom, setSelectedRoom] = useState({});
   const [rooms, setRooms] = useState([]);
-  const ourSelf = useSelector((state) => state.userStore.user);
   const [searchInput, setSearchInput] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     API.get("/api/rooms").then((res) => {
@@ -38,13 +38,13 @@ export const Chat = () => {
     }, 500);
   };
 
-  useEffect(() => {
-    return rooms.find((room) => {
-      if (room.id == roomId) {
-        return setSelectedRoom(room);
-      }
-    });
-  }, [rooms, roomId]);
+  // useEffect(() => {
+  //   return rooms.find((room) => {
+  //     if (room.id == roomId) {
+  //       return setSelectedRoom(room);
+  //     }
+  //   });
+  // }, [rooms, roomId]);
 
   return (
     <>
@@ -85,13 +85,9 @@ export const Chat = () => {
                     : "hover:bg-gray-100 rounded-lg dark:hover:bg-zinc-600"
                 }`}
                 key={room.id}
-                onClick={() => setSelectedRoom(room)}
+                onClick={() => dispatch(setSelectedRoom(room))}
               >
-                <ChatRoom
-                  room={room}
-                  activeUsers={activeUsers}
-                  ourSelf={ourSelf}
-                />
+                <ChatRoom room={room} />
               </Link>
             ))}
           </div>
@@ -106,10 +102,7 @@ export const Chat = () => {
         <div className="h-full flex flex-col">
           <Outlet
             context={{
-              room: selectedRoom,
               socket: socket,
-              activeUsers: activeUsers,
-              setSelectedRoom: setSelectedRoom,
             }}
           />
         </div>

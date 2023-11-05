@@ -1,27 +1,26 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "./Button";
 import userImg from "../assets/user.jpg";
-import lib, {
-  DeleteOutlined,
-  InfoCircleOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { API } from "../axios/API";
 import Select from "react-tailwindcss-select";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Divider } from "./Divider";
+import { useDispatch } from "react-redux";
+import { setSelectedRoom } from "../redux/roomSlice";
 
 export const CreateNewChat = () => {
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [existsRoom, setExistsRoom] = useState(null);
-  const { room, setSelectedRoom } = useOutletContext();
+  const { room } = useOutletContext();
   const navigate = useNavigate();
   const roomNameRef = useRef("");
+  const dispatch = useDispatch();
 
   const navigateToChatRoom = () => {
-    setSelectedRoom(existsRoom);
+    dispatch(setSelectedRoom(existsRoom));
     navigate(`/chat/${existsRoom.id}`);
   };
 

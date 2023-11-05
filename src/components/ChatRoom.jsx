@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import userImg from "../assets/user.jpg";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
-import dayjs from "dayjs";
 import moment from "moment/min/moment-with-locales";
 import { UserBubbleImageDisplayer } from "./UserBubbleImageDisplayer";
 import useHandleRoomName from "../hooks/useHandleRoomName";
@@ -12,7 +10,7 @@ const messageTypes = {
   empty: "Nincs még beszélgetés",
 };
 
-export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
+export const ChatRoom = ({ room }) => {
   const messageText = () => {
     if (room.lastMessage?.text.includes("dmvkh8wxf")) {
       return messageTypes.image;
@@ -25,11 +23,7 @@ export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
     return room.lastMessage?.text.slice(0, 40) + "...";
   };
 
-  const isAnyUserOnline = useIsAnyUserOnline(
-    ourSelf,
-    activeUsers,
-    room.participants
-  );
+  const isAnyUserOnline = useIsAnyUserOnline(room.participants);
   const [participantUsers, setParticipantUsers] = useState([]);
 
   useEffect(() => {
@@ -38,7 +32,7 @@ export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
     });
     setParticipantUsers(participantList);
   }, []);
-  console.log({ room });
+
   return (
     <>
       <div className="relative">
@@ -65,4 +59,8 @@ export const ChatRoom = ({ room, lastMessage, activeUsers, ourSelf }) => {
       </div>
     </>
   );
+};
+
+ChatRoom.propTypes = {
+  room: PropTypes.object.isRequired,
 };

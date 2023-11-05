@@ -1,29 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { CategoryMenu } from "../components/CategoryMenu";
 import { Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import io from "socket.io-client";
+import { handleActiveUsersList } from "../redux/activeUsersSlice";
 
 export const LandingPage = () => {
-  const ourSelf = useSelector((state) => state.userStore.user);
-  const [activeUsers, setActiveUsers] = useState([]);
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.userStore);
   let socket = useRef();
 
   useEffect(() => {
     socket.current = io("ws://192.168.0.26:8085");
-    const handleGetActiveUsers = (userList) => handleGetActiveUsers(userList);
-    const activeUsersListener = (userList) => {
-      const newList = Object.keys(userList).map((userId) => ({
-        id: userId,
-        sessionId: userList[userId],
-      }));
-      setActiveUsers(newList);
-    };
-    socket?.current.on("getActiveUsers", activeUsersListener);
-    socket.current.emit("getUserId", ourSelf.id);
+
+    socket?.current.on("getActiveUsers", (userList) =>
+      dispatch(handleActiveUsersList(userList))
+    );
+    socket?.current.emit("getUserId", user.id);
+
     return () => {
-      socket.current.off("getActiveUsers", activeUsersListener);
-      socket.current.disconnect();
+      socket?.current.off("getActiveUsers", (userList) =>
+        dispatch(handleActiveUsersList(userList))
+      );
+      socket?.current.disconnect();
     };
   }, []);
 
@@ -32,7 +31,6 @@ export const LandingPage = () => {
       <CategoryMenu />
       <Outlet
         context={{
-          activeUsers: activeUsers,
           socket: socket,
         }}
       />
