@@ -27,7 +27,7 @@ export const loginUser = createAsyncThunk('loginUser', async (user, { dispatch }
         dispatch(getAccountInfo());
     }).then(res => {
         
-    });
+    })
 });
 
 export const logoutUser = createAsyncThunk('logoutUser', async () => {
@@ -89,6 +89,7 @@ const loginSlice = createSlice({
             .addCase(logoutUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = null;
+                window.location.href = "/login";
             })
             .addCase(logoutUser.pending, (state) => {
                 state.loading = true

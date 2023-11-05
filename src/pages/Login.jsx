@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Button } from "../components/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/authSlice";
+import { getAccountInfo, loginUser } from "../redux/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import loginBg from "../assets/loginBg.gif";
 
 export const Login = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.userStore);
-  const { error } = useSelector((state) => state.userStore);
+  const { user, error } = useSelector((state) => state.userStore);
   const navigate = useNavigate();
 
   const [loginData, setLoginData] = useState({
@@ -25,7 +24,11 @@ export const Login = () => {
       navigate("/");
     }
   }, [user]);
-  console.log("error van", error);
+
+  useLayoutEffect(() => {
+    dispatch(getAccountInfo());
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser(loginData));

@@ -7,9 +7,8 @@ export const Logout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
-    console.log("logout");
-    dispatch(logoutUser());
-    navigate("/login");
+    const logout = dispatch(logoutUser());
+    console.log("logout", logout);
   }, []);
-  return <div>Logout</div>;
+  return null;
 };

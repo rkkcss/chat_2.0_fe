@@ -32,7 +32,7 @@ API.interceptors.response.use(
                     // notification.error({ message: "Valami nincs rendben!" });
                     break;
                 case 401:
-                    window.location.href = '/logout';
+                    //window.location.href = '/logout';
                     break;
                 default:
                     // notification.error({ message: error.response.statusText });
