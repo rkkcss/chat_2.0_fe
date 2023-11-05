@@ -211,7 +211,7 @@ export const ChatMessagesSection = () => {
               </div>
             )}
             <div onClick={sendMessageAndSave}>
-              <Button type={"primary"} text={"Küld"} />
+              <Button type={"button"} variant={"primary"} text={"Küld"} />
             </div>
           </div>
         </div>
