@@ -12,29 +12,30 @@ import {
 import useIsAnyUserOnline from "../hooks/useIsAnyUserOnline";
 import useHandleRoomName from "../hooks/useHandleRoomName";
 import { DropDown } from "./DropDown";
-
-const roomOptionsDropDown = [
-  {
-    id: 1,
-    label: "Tagok",
-    icon: <TeamOutlined />,
-    onClick: null,
-  },
-  {
-    id: 2,
-    label: "Szoba információk",
-    icon: <InfoCircleOutlined />,
-    onClick: null,
-  },
-];
+import { ChatInfoModal } from "./modals/ChatInfoModal";
 
 export const ChatMessageSectionHeader = () => {
+  const roomOptionsDropDown = [
+    {
+      id: 1,
+      label: "Tagok",
+      icon: <TeamOutlined />,
+      onClick: null,
+    },
+    {
+      id: 2,
+      label: "Szoba információk",
+      icon: <InfoCircleOutlined />,
+      onClick: () => setShowRoomInfoModal(true),
+    },
+  ];
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { selectedRoom } = useSelector((state) => state.roomStore);
   const { roomId } = useParams();
 
   const [participantUsers, setParticipantUsers] = useState([]);
+  const [showRoomInfoModal, setShowRoomInfoModal] = useState(false);
 
   const navigateBackToChatSelection = () => {
     dispatch(setSelectedRoom(null));
@@ -56,6 +57,10 @@ export const ChatMessageSectionHeader = () => {
 
   return (
     <div className="py-3 pl-5 pr-6 border-b">
+      <ChatInfoModal
+        isOpen={showRoomInfoModal}
+        closeModal={() => setShowRoomInfoModal(false)}
+      />
       <div className="flex items-center justify-between">
         <LeftOutlined
           className="lg:hidden mr-4 text-slate-700 text-2xl cursor-pointer"
