@@ -64,14 +64,18 @@ export const CategoryMenu = () => {
           className="w-12 h-12 rounded-full mx-auto"
         />
       </div>
-      <div className="text-gray-400 flex flex-col gap-5 px-1 items-center">
+      <div className="text-gray-400 flex flex-col gap-7 px-1 items-center">
         {menuItems.map((menuItem) => {
           return (
-            <Tooltip key={menuItem.id} tooltipMessage={menuItem.tooltip}>
+            <Tooltip
+              key={menuItem.id}
+              tooltipMessage={menuItem.tooltip}
+              textPosition={"right"}
+            >
               <Link
                 to={menuItem.link}
                 className={`
-              shadow-slate-600 w-full p-3 
+              shadow-slate-600 w-full py-4 px-3 
               ${
                 isMenuItemActive(menuItem)
                   ? "bg-emerald-300 text-gray-700 rounded-lg"
@@ -104,7 +108,7 @@ export const CategoryMenu = () => {
           )}
         </div>
         <div className="flex justify-center">
-          <Tooltip tooltipMessage={"Kijelentkezés"}>
+          <Tooltip tooltipMessage={"Kijelentkezés"} textPosition={"right"}>
             <Link
               to={"/logout"}
               className="text-gray-400 w-full p-3 hover:rounded-lg hover:bg-gray-100 hover:cursor-pointer hover:text-gray-700"

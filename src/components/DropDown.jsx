@@ -35,22 +35,20 @@ export const DropDown = ({ children, dropDownElements }) => {
           <div className="py-1" role="none">
             {dropDownElements.map((element) => {
               return (
-                <>
-                  <a
-                    key={element.id}
-                    href="#"
-                    className="text-gray-700 
+                <a
+                  key={element.id}
+                  href="#"
+                  className="text-gray-700 
                   flex items-center gap-2 
                   px-4 py-2 
                   text-sm hover:bg-emerald-300"
-                    role="menuitem"
-                    tabIndex="-1"
-                    onClick={element.onClick}
-                  >
-                    {element.icon}
-                    {element.label}
-                  </a>
-                </>
+                  role="menuitem"
+                  tabIndex="-1"
+                  onClick={element.onClick}
+                >
+                  {element.icon}
+                  {element.label}
+                </a>
               );
             })}
           </div>

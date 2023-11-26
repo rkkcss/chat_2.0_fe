@@ -59,7 +59,7 @@ export const Chat = () => {
               <h1 className="font-bold text-2xl text-gray-700 dark:text-slate-100">
                 Üzenetek
               </h1>
-              <Tooltip tooltipMessage={"Új üzenet"}>
+              <Tooltip tooltipMessage={"Új üzenet"} textPosition={"right"}>
                 <Link to={"/chat/new"}>
                   <PlusCircleOutlined
                     className="text-2xl
