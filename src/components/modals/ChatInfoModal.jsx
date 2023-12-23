@@ -10,6 +10,7 @@ import {
 import { Input } from "../Input";
 import { useLayoutEffect, useState } from "react";
 import { Tooltip } from "../Tooltip";
+import userDefault from "../../assets/userDefault.jpg";
 
 export const ChatInfoModal = ({ isOpen, closeModal }) => {
   const { selectedRoom } = useSelector((state) => state.roomStore);
@@ -60,7 +61,11 @@ export const ChatInfoModal = ({ isOpen, closeModal }) => {
                       className="flex items-center gap-3 group"
                     >
                       <img
-                        src={participant.user.imageUrl}
+                        src={
+                          participant.user.imageUrl
+                            ? participant.user.imageUrl
+                            : userDefault
+                        }
                         alt="Profile image"
                         className="rounded-full w-8 h-8"
                       />

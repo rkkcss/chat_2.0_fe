@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import userImg from "../assets/user.jpg";
 import {
   CloseOutlined,
@@ -30,12 +30,14 @@ export const ChatMessagesSection = () => {
   const [messages, setMessages] = useState(new Map());
   const ourSelf = useSelector((state) => state.userStore.user);
   const [imageMessage, setImageMessage] = useState("");
+  let userTypingTimeout = useRef(null);
 
   const { pagination, setPagination, loading, lastElementRef, setLoading } =
     usePagination();
 
   useEffect(() => {
     socket?.current?.on("userStartTypingToClient", (res) => {
+      console.log("restyping", res);
       if (res.roomId == roomId && ourSelf.id != res.user.id) {
         setIsUserTyping(true);
       }
@@ -114,20 +116,21 @@ export const ChatMessagesSection = () => {
     setMessageInput(e);
 
     socket?.current?.emit("userStartTypingToServer", {
-      user: {
-        id: ourSelf?.id,
-      },
+      user: ourSelf,
       roomId: roomId,
     });
 
-    setTimeout(() => {
-      socket?.current?.emit("userStopTypingToServer", {
-        user: {
-          id: ourSelf?.id,
-        },
-        roomId: roomId,
-      });
-    }, 3000);
+    if (!isUserTyping && userTypingTimeout.current == null) {
+      userTypingTimeout.current = setTimeout(() => {
+        socket?.current?.emit("userStopTypingToServer", {
+          user: {
+            id: ourSelf?.id,
+          },
+          roomId: roomId,
+        });
+        userTypingTimeout.current = null;
+      }, 3000);
+    }
   };
 
   useEffect(() => {
@@ -150,6 +153,12 @@ export const ChatMessagesSection = () => {
       {/* Chat message section header component */}
       <ChatMessageSectionHeader />
       <div className="flex-grow p-6 overflow-y-auto relative flex flex-col-reverse gap-2">
+        <div className={`${isUserTyping ? "block" : "hidden"}`}>
+          <span className="flex items-center gap-2 left-3">
+            <img src={userImg} alt="" className="w-6 h-6 rounded-full" />
+            <TypeingDots />
+          </span>
+        </div>
         {Array.from(messages.values()).map((message, i) =>
           i + 1 === messages.size ? (
             <Message
@@ -161,12 +170,6 @@ export const ChatMessagesSection = () => {
             <Message message={message} key={message.id} />
           )
         )}
-        <div className={`${isUserTyping ? "block" : "hidden"}`}>
-          <span className="flex items-center gap-2 left-3">
-            <img src={userImg} alt="" className="w-6 h-6 rounded-full" />
-            <TypeingDots />
-          </span>
-        </div>
       </div>
 
       <div className="w-full block border-t px-6 pb-4 border-gray-300">
