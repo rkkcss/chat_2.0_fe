@@ -13,6 +13,7 @@ import moonIcon from "../assets/moon-icon.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/authSlice";
 import { Tooltip } from "./Tooltip";
+import userDefault from "../assets/userDefault.jpg";
 
 export const CategoryMenu = () => {
   const { theme, user } = useSelector((state) => state.userStore);
@@ -60,6 +61,9 @@ export const CategoryMenu = () => {
       <div>
         <img
           src={user.imageUrl}
+          onError={({ currentTarget }) => {
+            currentTarget.src = userDefault;
+          }}
           alt="User picture"
           className="w-12 h-12 rounded-full mx-auto"
         />

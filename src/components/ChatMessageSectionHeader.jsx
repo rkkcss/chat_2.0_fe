@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { setSelectedRoom } from "../redux/roomSlice";
 import { UserBubbleImageDisplayer } from "./UserBubbleImageDisplayer";
 import {
@@ -32,9 +32,7 @@ export const ChatMessageSectionHeader = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { selectedRoom } = useSelector((state) => state.roomStore);
-  const { roomId } = useParams();
 
-  const [participantUsers, setParticipantUsers] = useState([]);
   const [showRoomInfoModal, setShowRoomInfoModal] = useState(false);
 
   const navigateBackToChatSelection = () => {
@@ -43,17 +41,6 @@ export const ChatMessageSectionHeader = () => {
   };
 
   const isAnyUserOnline = useIsAnyUserOnline(selectedRoom?.participants);
-
-  const filterParticipantsForOnlyUsers = () => {
-    const participantList = selectedRoom.participants.map((participant) => {
-      return { ...participant.user };
-    });
-    setParticipantUsers(participantList);
-  };
-
-  useEffect(() => {
-    filterParticipantsForOnlyUsers();
-  }, [roomId]);
 
   return (
     <div className="py-3 pl-5 pr-6 border-b">
@@ -67,7 +54,7 @@ export const ChatMessageSectionHeader = () => {
           onClick={() => navigateBackToChatSelection()}
         />
         <div className="relative">
-          <UserBubbleImageDisplayer users={participantUsers} />
+          <UserBubbleImageDisplayer participants={selectedRoom.participants} />
         </div>
         <div className="w-full flex items-center justify-between ml-3">
           <div>

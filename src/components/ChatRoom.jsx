@@ -24,20 +24,12 @@ export const ChatRoom = ({ room }) => {
   };
 
   const isAnyUserOnline = useIsAnyUserOnline(room.participants);
-  const [participantUsers, setParticipantUsers] = useState([]);
-
-  useEffect(() => {
-    const participantList = room.participants.map((participant) => {
-      return { ...participant.user };
-    });
-    setParticipantUsers(participantList);
-  }, []);
 
   return (
     <>
       <div className="relative">
         <UserBubbleImageDisplayer
-          users={participantUsers}
+          participants={room.participants}
           isOnlineBubble={isAnyUserOnline}
         />
       </div>
